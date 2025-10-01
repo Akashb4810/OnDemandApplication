@@ -1,0 +1,97 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/_masterLayoutPage.cshtml";
+}
+
+<!-- HERO SECTION -->
+<section class="py-5 text-center text-white position-relative"
+         style="background: url('/images/stetusScop.jpg') center/cover no-repeat; min-height: 80vh;">
+    <div class="overlay position-absolute top-0 start-0 w-100 h-100"
+         style="background: rgba(0,0,0,0.6);"></div>
+    <div class="container position-relative z-1 d-flex flex-column align-items-center justify-content-center h-100">
+        <h1 class="display-4 fw-bold mb-3 animate__animated animate__fadeInDown">🔬 Laboratory Inventory System</h1>
+        <p class="lead mb-4 animate__animated animate__fadeInUp">
+            Manage Patients • Inventory • Reports — All in one secure platform.
+        </p>
+    </div>
+</section>
+
+<!-- FEATURES SECTION -->
+<section id="features" class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <h2 class="fw-bold">⚡ Key Features</h2>
+            <p class="text-muted">Smart tools designed for labs & diagnostics</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow hover-shadow">
+                    <img src="/images/download (2).jpg" style="height:200px" class="card-img-top rounded-top" alt="Inventory">
+                    <div class="card-body text-center">
+                        <h5 class="card-title mt-2">Inventory Management</h5>
+                        <p class="text-muted">Track chemicals, medicines, and equipment stock in real-time.</p>
+                        <a href="#" class="btn btn-outline-primary btn-sm">Manage Inventory</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow hover-shadow">
+                    <img src="/images/payment.jpg" style="height:200px" class="card-img-top rounded-top" alt="Payments">
+                    <div class="card-body text-center">
+                        <h5 class="card-title mt-2">Payments & Billing</h5>
+                        <p class="text-muted">Generate invoices, manage payments, and automate billing.</p>
+                        <a href="#" class="btn btn-outline-success btn-sm">View Payments</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow hover-shadow">
+                    <img src="/images/report.jpg" style="height:200px" class="card-img-top rounded-top" alt="Reports">
+                    <div class="card-body text-center">
+                        <h5 class="card-title mt-2">Reports & Analytics</h5>
+                        <p class="text-muted">Analyze stock usage and patient test data with smart insights.</p>
+                        <a href="#" class="btn btn-outline-warning btn-sm">View Reports</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ABOUT SECTION -->
+<section class="bg-primary text-white py-5">
+    <div class="container text-center">
+        <img src="/images/lab.jpg" class="rounded-circle mb-4 shadow" width="120" alt="Team">
+        <h2 class="fw-bold mb-3">🚀 Why Choose Our System?</h2>
+        <p class="mb-4">
+            Secure, fast, and tailored for laboratories to manage patients, payments, and inventory effortlessly.
+        </p>
+        @* <a href="@Url.Action("Dashboard","Home")" class="btn btn-light btn-lg shadow">Start Now</a> *@
+    </div>
+</section>
+
+<!-- CONTACT SECTION -->
+@* <section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <h2 class="fw-bold">📩 Contact Us</h2>
+            <p class="text-muted">We’re here to support your lab’s digital journey</p>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <form class="p-4 shadow-sm rounded bg-white">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" placeholder="Your Name" />
+                    </div>
+                    <div class="mb-3">
+                        <input type="email" class="form-control" placeholder="Email Address" />
+                    </div>
+                    <div class="mb-3">
+                        <textarea class="form-control" rows="4" placeholder="Your Message"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 shadow-sm">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section> *@

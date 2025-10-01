@@ -1,0 +1,93 @@
+﻿@model List<LabCollect.Models.PaymentViewModel>
+
+@{
+    ViewData["Title"] = "OnlinePayments";
+    Layout = "~/Views/_assistantLayoutPage.cshtml";
+}
+
+<h1>Online Payments</h1>
+
+<!-- Filters -->
+<form asp-action="OnlinePayments" method="get" class="row g-3 mb-3">
+    <div class="col-md-3">
+        <label class="form-label">From Date</label>
+        <input type="date" name="fromDate" class="form-control" value="@ViewBag.FromDate" />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">To Date</label>
+        <input type="date" name="toDate" class="form-control" value="@ViewBag.ToDate" />
+    </div>
+    <div class="col-md-2 align-self-end">
+        <button type="submit" class="btn btn-primary w-100">Apply</button>
+    </div>
+</form>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>PaymentId</th>
+            <th>PatientId</th>
+            <th>Patient Name</th>
+            <th>PaidAmount</th>
+            <th>RemainingAmount</th>
+            <th>Method</th>
+            <th>TransactionDate</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.PaymentId</td>
+                <td>@item.PatientId</td>
+                <td>@item.PatientName</td>
+                <td>@item.PaidAmount</td>
+                <td>@item.RemaingAmount</td>
+                <td>@item.PaymentMethod</td>
+                <td>@item.CreatedDate.ToString("dd-MM-yyyy")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Pagination controls -->
+<div class="d-flex justify-content-end align-items-center gap-3 mt-3">
+    <!-- Items per page -->
+    <form asp-action="OnlinePayments" method="get" class="d-flex align-items-center gap-2">
+        <label for="pageSize" class="mb-0">Items per page:</label>
+        <select name="pageSize" id="pageSize" class="form-select form-select-sm" style="width:auto;" onchange="this.form.submit()">
+            @foreach (var size in new int[] { 5, 10, 15, 25 })
+            {
+                if (ViewBag.PageSize == size)
+                {
+                    <option value="@size" selected="selected">@size</option>
+                }
+                else
+                {
+                    <option value="@size">@size</option>
+                }
+            }
+        </select>
+
+        <!-- Hidden fields to keep filters -->
+        <input type="hidden" name="fromDate" value="@ViewBag.FromDate" />
+        <input type="hidden" name="toDate" value="@ViewBag.ToDate" />
+    </form>
+
+    <!-- Page info -->
+    <span class="mb-0">Page @ViewBag.CurrentPage of @ViewBag.TotalPages</span>
+
+    <!-- Arrows -->
+    <div class="btn-group" role="group">
+        <a class="btn btn-outline-secondary btn-sm @(ViewBag.CurrentPage == 1 ? "disabled" : "")"
+           href="@Url.Action("OnlinePayments", new { page = ViewBag.CurrentPage - 1, pageSize = ViewBag.PageSize,
+                                                     fromDate = ViewBag.FromDate, toDate = ViewBag.ToDate })">
+            <i class="fa fa-chevron-left"></i>
+        </a>
+        <a class="btn btn-outline-secondary btn-sm @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")"
+           href="@Url.Action("OnlinePayments", new { page = ViewBag.CurrentPage + 1, pageSize = ViewBag.PageSize,
+                                                     fromDate = ViewBag.FromDate, toDate = ViewBag.ToDate })">
+            <i class="fa fa-chevron-right"></i>
+        </a>
+    </div>
+</div>

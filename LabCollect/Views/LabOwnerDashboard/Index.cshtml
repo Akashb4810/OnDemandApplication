@@ -1,0 +1,147 @@
+﻿@model OwnerDashboardViewModel
+@{
+    ViewData["Title"] = "Lab Owner Dashboard";
+    Layout = "~/Views/_masterUserLayoutPage.cshtml";
+}
+
+<style>
+   
+
+    /* Card styling */
+    .dashboard-card {
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+        .dashboard-card:hover {
+            transform: translateY(-4px);
+        }
+
+    /* Table styling */
+    .table-hover tbody tr:hover {
+        background-color: #f1f5f9;
+    }
+
+    .table thead th {
+        background-color: #f8fafc;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    /* Button */
+    .btn-info {
+        background-color: #4facfe;
+        border-color: #4facfe;
+    }
+
+        .btn-info:hover {
+            background-color: #00c6ff;
+            border-color: #00c6ff;
+        }
+</style>
+
+<div class="container mt-4">
+
+    <!-- Filter Form -->
+    <form method="get" asp-action="Index" class="row g-3 mb-4">
+        <div class="col-md-3">
+            <label class="form-label fw-bold">Start Date</label>
+            <input type="date" name="startDate" value="@ViewBag.StartDate" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-bold">End Date</label>
+            <input type="date" name="endDate" value="@ViewBag.EndDate" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Payment Received By (Assistant Name)</label>
+            <input type="text" name="paymentReceivedBy" value="@ViewBag.PaymentReceivedBy" class="form-control" placeholder="Assistant Name" />
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+        </div>
+    </form>
+
+    <!-- Totals Section -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card text-bg-light dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-people"></i> Total Patients</h5>
+                    <p class="card-text fs-3 fw-bold">@Model.TotalPatients</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-bg-light dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-cash"></i> Total Payment Collected</h5>
+                    <p class="card-text fs-3 fw-bold">₹@Model.TotalPayment</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-bg-light dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-wallet2"></i> Total Remaining Amount</h5>
+                    <p class="card-text fs-3 fw-bold">₹@Model.TotalRemaining</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-bg-light dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-bank"></i> Total Received By Owner</h5>
+                    <p class="card-text fs-3 fw-bold">₹@Model.TotalReceivedByOwner</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-bg-light dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-exclamation-circle"></i> Unpaid To Owner</h5>
+                    <p class="card-text fs-3 fw-bold">₹@Model.TotalUnpaidToOwner</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assistant Table -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Assistant Name</th>
+                    <th>Patient Count</th>
+                    <th>Total Payment Collected</th>
+                    <th>Total Remaining</th>
+                    <th>Paid by Owner</th>
+                    <th>Unpaid to Owner</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.AssistantSummaries)
+                {
+                    <tr>
+                        <td class="fw-semibold">@item.AssistantName</td>
+                        <td>@item.PatientCount</td>
+                        <td class="text-success">₹@item.TotalPaymentCollected</td>
+                        <td class="text-warning">₹@item.TotalRemainingAmount</td>
+                        <td class="text-primary">₹@item.TotalReceivedByOwner</td>
+                        <td class="text-danger">₹@item.TotalUnpaidToOwner</td>
+                        <td>
+                            <a asp-action="Transactions"
+                               asp-controller="LabOwnerDashboard"
+                               asp-route-assistantId="@item.AssistantId"
+                               asp-route-startDate="@ViewBag.StartDate"
+                               asp-route-endDate="@ViewBag.EndDate"
+                               asp-route-paymentReceivedBy="@item.AssistantId"
+                               class="btn btn-sm btn-info">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

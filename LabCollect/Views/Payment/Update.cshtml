@@ -1,0 +1,63 @@
+﻿@model LabCollect.Models.PaymentTransactionViewModel
+@{
+    ViewData["Title"] = "Update";
+    Layout = "~/Views/_assistantLayoutPage.cshtml";
+}
+
+
+<div class="container mt-5" style="max-width:500px;">
+    <div class="card shadow-lg border-0 rounded-3">
+        <div class="card-body">
+            <h3 class="text-center mb-4 text-primary fw-bold">💰 Add Payment</h3>
+
+            @if (ViewBag.Message != null)
+            {
+                <div class="alert @(ViewBag.Message.Contains("Failed") ? "alert-danger" : "alert-success")">
+                    @ViewBag.Message
+                </div>
+            }
+
+            <form asp-action="Update" method="post">
+                <div class="mb-3">
+                    <label asp-for="PaymentId" class="form-label fw-semibold">PaymentId ID</label>
+                    <input asp-for="PaymentId" class="form-control" placeholder="Enter Payment ID" />
+                    <span asp-validation-for="PaymentId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PaidAmount" class="form-label fw-semibold">Remaining Payment: @Model.RemaingAmount</label>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PaidAmount" class="form-label fw-semibold">Amount</label>
+                    <input asp-for="PaidAmount" class="form-control" placeholder="Enter Amount" />
+                    <span asp-validation-for="PaidAmount" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PaymentMethod" class="form-label fw-semibold">Payment Method</label>
+                    <select asp-for="PaymentMethod" class="form-select">
+                        <option value="">-- Select --</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Online">Online</option>
+                        <option value="CashLess">Cash Less</option>
+                    </select>
+                    <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Notes" class="form-label fw-semibold">Note </label>
+                    <input asp-for="Notes" class="form-control" placeholder="Enter Note" />
+                    <span asp-validation-for="Notes" class="text-danger"></span>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100 py-2">💾 Save Payment</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

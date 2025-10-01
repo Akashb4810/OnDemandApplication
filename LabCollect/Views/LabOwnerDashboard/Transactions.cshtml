@@ -1,0 +1,139 @@
+﻿@model List<TransactionDetail>
+@{
+    ViewData["Title"] = "Transactions";
+    Layout = "~/Views/_masterUserLayoutPage.cshtml";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3">Assistant Transactions</h2>
+
+    <!-- Filters -->
+    <form asp-action="Transactions" method="get" class="row g-3 mb-3">
+        <input type="hidden" name="assistantId" value="@ViewBag.AssistantId" />
+        <div class="col-md-3">
+            <label class="form-label">Start Date</label>
+            <input type="date" name="startDate" class="form-control" value="@ViewBag.StartDate" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">End Date</label>
+            <input type="date" name="endDate" class="form-control" value="@ViewBag.EndDate" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Received By</label>
+            <input type="text" name="paymentReceivedBy" class="form-control" value="@ViewBag.PaymentReceivedBy" placeholder="Assistant/Owner Name" />
+        </div>
+        <div class="col-md-2 align-self-end">
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+        </div>
+    </form>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Date</th>
+                <th>Patient</th>
+                <th>Patient Name</th>
+                <th>Payment ID</th>
+                <th>Paid Amount</th>
+                <th>Method</th>
+                <th>Note</th>
+                <th>Remaining</th>
+                <th>Received By</th>
+                <th>Owner Received?</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model)
+            {
+                <tr>
+                    <td>@t.TransactionDate.ToString("dd-MMM-yyyy HH:mm")</td>
+                    <td>@t.PatientId</td>
+                    <td>@t.PatientName</td>
+                    <td>@t.PaymentId</td>
+                    <td>₹@t.PaidAmount</td>
+                    <td>@t.PaymentMethod</td>
+                    <td>@t.Notes</td>
+                    <td>₹@t.RemainingAmount</td>
+                    <td>@t.PaymentRecivedBy</td>
+                    <td>
+                        @if (t.IsReceivedByOwner)
+                        {
+                            <span class="badge bg-success">Yes</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning">No</span>
+                        }
+                    </td>
+                    <td>
+                        @if (!t.IsReceivedByOwner)
+                        {
+                            <form asp-action="MarkReceivedByOwner"
+                                  asp-controller="LabOwnerDashboard"
+                                  method="post">
+                                <input type="hidden" name="transactionId" value="@t.TransactionId" />
+                                <input type="hidden" name="assistantId" value="@ViewBag.AssistantId" />
+                                <button type="submit" class="btn btn-sm btn-primary">Mark Received</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Pagination controls -->
+    <div class="d-flex justify-content-end align-items-center gap-3 mt-3">
+        <!-- Items per page -->
+        <form asp-action="Transactions" method="get" class="d-flex align-items-center gap-2">
+            <input type="hidden" name="assistantId" value="@ViewBag.AssistantId" />
+            <input type="hidden" name="startDate" value="@ViewBag.StartDate" />
+            <input type="hidden" name="endDate" value="@ViewBag.EndDate" />
+            <input type="hidden" name="paymentReceivedBy" value="@ViewBag.PaymentReceivedBy" />
+            <label for="pageSize" class="mb-0">Items per page:</label>
+            <select name="pageSize" id="pageSize" class="form-select form-select-sm" style="width:auto;" onchange="this.form.submit()">
+                @foreach (var size in new int[] { 5, 10, 15, 25 })
+                {
+                    if (ViewBag.PageSize == size)
+                    {
+                        <option value="@size" selected>@size</option>
+                    }
+                    else
+                    {
+                        <option value="@size">@size</option>
+                    }
+                }
+            </select>
+        </form>
+
+        <span>Page @ViewBag.CurrentPage of @ViewBag.TotalPages</span>
+
+        <div class="btn-group" role="group">
+            <a class="btn btn-outline-secondary btn-sm @(ViewBag.CurrentPage == 1 ? "disabled" : "")"
+               href="@Url.Action("Transactions", new {
+                   assistantId = ViewBag.AssistantId,
+                   startDate = ViewBag.StartDate,
+                   endDate = ViewBag.EndDate,
+                   paymentReceivedBy = ViewBag.PaymentReceivedBy,
+                   page = ViewBag.CurrentPage - 1,
+                   pageSize = ViewBag.PageSize
+               })">
+                <i class="fa fa-chevron-left"></i>
+            </a>
+            <a class="btn btn-outline-secondary btn-sm @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")"
+               href="@Url.Action("Transactions", new {
+                   assistantId = ViewBag.AssistantId,
+                   startDate = ViewBag.StartDate,
+                   endDate = ViewBag.EndDate,
+                   paymentReceivedBy = ViewBag.PaymentReceivedBy,
+                   page = ViewBag.CurrentPage + 1,
+                   pageSize = ViewBag.PageSize
+               })">
+                <i class="fa fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <a asp-action="Index" class="btn btn-secondary mt-3">Back to Dashboard</a>
+</div>

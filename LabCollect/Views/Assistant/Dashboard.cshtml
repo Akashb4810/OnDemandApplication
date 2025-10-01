@@ -1,0 +1,67 @@
+﻿@model LabCollect.Models.AssistantDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/_assistantLayoutPage.cshtml";
+}
+
+<h2>Assistant Dashboard</h2>
+<form asp-action="Dashboard" method="get" class="row mb-3">
+    <div class="col-md-3">
+        <label>From Date</label>
+        <input type="date" name="fromDate" value="@ViewBag.FromDate" class="form-control" />
+    </div>
+    <div class="col-md-3">
+        <label>To Date</label>
+        <input type="date" name="toDate" value="@ViewBag.ToDate" class="form-control" />
+    </div>
+    <div class="col-md-3 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </div>
+</form>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm border-primary">
+            <div class="card-body">
+                <h6>Total Patients</h6>
+                <h3>@Model.TotalPatients</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm border-warning">
+            <div class="card-body">
+                <h6>Remaining Amount</h6>
+                <h3>@Model.TotalRemaining</h3>
+                <a asp-action="RemainingPayments" asp-route-fromDate="@ViewBag.FromDate" asp-route-toDate="@ViewBag.ToDate">View</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm border-success">
+            <div class="card-body">
+                <h6>Paid Amount</h6>
+                <h3>@Model.TotalPaid</h3>
+                <a asp-action="PaidPayments" asp-route-fromDate="@ViewBag.FromDate" asp-route-toDate="@ViewBag.ToDate">View</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm border-info">
+            <div class="card-body">
+                <h6>Online Payments</h6>
+                <h3>@Model.TotalOnline</h3>
+                <a asp-action="OnlinePayments" asp-route-fromDate="@ViewBag.FromDate" asp-route-toDate="@ViewBag.ToDate">View</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mt-3">
+        <div class="card text-center shadow-sm border-secondary">
+            <div class="card-body">
+                <h6>Cash Payments</h6>
+                <h3>@Model.TotalCash</h3>
+                <a asp-action="CashPayments" asp-route-fromDate="@ViewBag.FromDate" asp-route-toDate="@ViewBag.ToDate">View</a>
+            </div>
+        </div>
+    </div>
+</div>

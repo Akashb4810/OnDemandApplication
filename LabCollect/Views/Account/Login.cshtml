@@ -1,0 +1,43 @@
+﻿@model LabCollect.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/_masterLayoutPage.cshtml";
+}
+
+<div class="container mt-5" style="max-width:400px;">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h3 class="text-center mb-4 text-primary">Login</h3>
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">@ViewBag.Error</div>
+            }
+            <form asp-action="Login" method="post">
+                <div class="mb-3">
+                    <label asp-for="UserName" class="form-label"></label>
+                    <input asp-for="UserName" class="form-control" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label"></label>
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label for="SelectedAppType" class="form-label">Application</label>
+                    <select asp-for="SelectedAppType" class="form-select" asp-items="@(new SelectList(Model.AppTypes, "AppTypeId", "AppTypeName"))">
+                        <option value="">-- Select --</option>
+                    </select>
+                    <span asp-validation-for="SelectedAppType" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+

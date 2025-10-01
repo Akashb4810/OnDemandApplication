@@ -1,0 +1,215 @@
+﻿@model LabCollect.Models.PaymentPatientViewModel
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/_assistantLayoutPage.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body p-4">
+            <h2 class="text-center mb-4 text-primary fw-bold">
+                <i class="bi bi-cash-coin me-2"></i> Add Payment
+            </h2>
+
+            @if (ViewBag.Message != null)
+            {
+                <div class="alert @(ViewBag.Message.Contains("Failed") ? "alert-danger" : "alert-success")">
+                    @ViewBag.Message
+                </div>
+            }
+
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+                <!-- Patient Information -->
+                <h5 class="text-secondary fw-bold mb-3">👤 Patient Information</h5>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label asp-for="SampleId" class="form-label fw-semibold">Sample ID</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                            <input asp-for="SampleId" class="form-control" placeholder="Enter Sample ID" />
+                        </div>
+                        <span asp-validation-for="SampleId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="PatientId" class="form-label fw-semibold">Patient ID</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                            <input asp-for="PatientId" class="form-control" placeholder="Enter Patient ID" readonly />
+                        </div>
+                        <span asp-validation-for="PatientId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="PatientName" class="form-label fw-semibold">Patient Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input asp-for="PatientName" class="form-control" placeholder="Enter Patient Name" />
+                        </div>
+                        <span asp-validation-for="PatientName" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="DateOfBirth" class="form-label fw-semibold">Date of Birth</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
+                            <input asp-for="DateOfBirth" type="date" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Gender" class="form-label fw-semibold">Gender</label>
+                        <select asp-for="Gender" class="form-select">
+                            <option value="">-- Select Gender --</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <span asp-validation-for="Gender" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="ContactNumber" class="form-label fw-semibold">Contact Number</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                            <input asp-for="ContactNumber" class="form-control" placeholder="Enter Contact Number" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label fw-semibold">Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            <input asp-for="Email" type="email" class="form-control" placeholder="Enter Email Address" />
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Address" class="form-label fw-semibold">Address</label>
+                        <textarea asp-for="Address" rows="2" class="form-control" placeholder="Enter Address"></textarea>
+                    </div>
+                </div>
+
+                <!-- Payment Information -->
+                <h5 class="text-secondary fw-bold mt-4 mb-3">💳 Payment Information</h5>
+                <div class="row g-3">
+                    <!-- Total Amount -->
+                    <div class="col-md-6">
+                        <label asp-for="TotalAmount" class="form-label fw-semibold">Total Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₹</span>
+                            <input asp-for="TotalAmount" class="form-control" id="TotalAmount" placeholder="Enter Total Amount" />
+                        </div>
+                        <span asp-validation-for="TotalAmount" class="text-danger"></span>
+                    </div>
+
+                    <!-- Discount Amount -->
+                    <div class="col-md-6">
+                        <label asp-for="DiscountAmount" class="form-label fw-semibold">Discount</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₹</span>
+                            <input asp-for="DiscountAmount" class="form-control" id="DiscountAmount" placeholder="Enter Discount" />
+                        </div>
+                        <span asp-validation-for="DiscountAmount" class="text-danger"></span>
+                    </div>
+
+                    <!-- Final Amount (readonly) -->
+                    <div class="col-md-6">
+                        <label asp-for="Amount" class="form-label fw-semibold">Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₹</span>
+                            <input asp-for="Amount" class="form-control" id="Amount" readonly />
+                        </div>
+                        <span asp-validation-for="Amount" class="text-danger"></span>
+                    </div>
+
+                    <!-- Paid Amount -->
+                    <div class="col-md-6">
+                        <label asp-for="PaidAmount" class="form-label fw-semibold">Paid Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₹</span>
+                            <input asp-for="PaidAmount" class="form-control" placeholder="Enter Paid Amount" />
+                        </div>
+                        <span asp-validation-for="PaidAmount" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="PaymentMethod" class="form-label fw-semibold">Payment Method</label>
+                        <select asp-for="PaymentMethod" class="form-select">
+                            <option value="">-- Select --</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Online">Online</option>
+                            <option value="CashLess">Cash Less</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Status" class="form-label fw-semibold">Status</label>
+                        <select asp-for="Status" class="form-select">
+                            <option value="">-- Select --</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Unpaid">Unpaid</option>
+                        </select>
+                        <span asp-validation-for="Status" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Notes" class="form-label fw-semibold">Note </label>
+                        <input asp-for="Notes" class="form-control" placeholder="Enter Note" />
+                        <span asp-validation-for="Notes" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label asp-for="TestImage" class="form-label fw-semibold">Upload Test Image</label>
+                        <input asp-for="TestImage" type="file" class="form-control" id="TestImage" accept="image/*" onchange="previewImage(event)" />
+                        <span asp-validation-for="TestImage" class="text-danger"></span>
+
+                        <!-- Preview -->
+                        <div class="mt-3">
+                            <img id="ImagePreview" src="#" alt="Preview" class="img-fluid rounded shadow-sm d-none" style="max-height:200px;" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden Assistant ID -->
+                <input asp-for="AssistantId" type="hidden" />
+
+                <!-- Submit Button -->
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm">
+                        <i class="bi bi-save me-1"></i> Save Payment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function calculateAmount() {
+            let total = parseFloat(document.getElementById("TotalAmount").value) || 0;
+            let discount = parseFloat(document.getElementById("DiscountAmount").value) || 0;
+            let finalAmount = total - discount;
+
+            if (finalAmount < 0) finalAmount = 0; // prevent negative values
+
+            document.getElementById("Amount").value = finalAmount.toFixed(2);
+        }
+
+        document.getElementById("TotalAmount").addEventListener("input", calculateAmount);
+        document.getElementById("DiscountAmount").addEventListener("input", calculateAmount);
+
+        // Preview uploaded image
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function () {
+                const preview = document.getElementById('ImagePreview');
+                preview.src = reader.result;
+                preview.classList.remove("d-none");
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    </script>
+}

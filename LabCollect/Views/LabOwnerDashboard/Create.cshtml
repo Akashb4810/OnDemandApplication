@@ -1,0 +1,83 @@
+﻿@model LabCollect.Models.UserViewModel
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/_masterUserLayoutPage.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3>Create User</h3>
+        </div>
+        <div class="card-body">
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success">@TempData["Success"]</div>
+            }
+
+            <form asp-action="Create" method="post" class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="UserName" class="form-label"></label>
+                    <input asp-for="UserName" class="form-control" placeholder="Enter username" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="PasswordHash" class="form-label">Password</label>
+                    <input asp-for="PasswordHash" type="password" class="form-control" placeholder="Enter password" />
+                    <span asp-validation-for="PasswordHash" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="RoleId" class="form-label">Role</label>
+                    <select asp-for="RoleId" asp-items="ViewBag.Roles" class="form-select">
+                        <option value="">-- Select Role --</option>
+                    </select>
+                    <span asp-validation-for="RoleId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="AppTypeId" class="form-label">App Type</label>
+                    <select asp-for="AppTypeId" asp-items="ViewBag.AppTypes" class="form-select">
+                        <option value="">-- Select App Type --</option>
+                    </select>
+                    <span asp-validation-for="AppTypeId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="FullName" class="form-label">Full Name</label>
+                    <input asp-for="FullName" class="form-control" placeholder="Enter full name" />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Email" class="form-label">Email</label>
+                    <input asp-for="Email" type="email" class="form-control" placeholder="Enter email" />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+                    <input asp-for="PhoneNumber" class="form-control" placeholder="Enter phone number" />
+                </div>
+
+                <div class="col-md-6 d-flex align-items-center">
+                    <div class="form-check mt-4">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label">Is Active?</label>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary me-2">Create User</button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

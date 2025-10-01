@@ -1,0 +1,285 @@
+﻿@model List<LabCollect.Models.PaymentViewModel>
+
+@{
+    ViewData["Title"] = "Assistant Dashboard";
+    Layout = "~/Views/_assistantLayoutPage.cshtml";
+
+    string selectedMethod = ViewBag.SelectedPaymentMethod as string ?? "";
+    string selectedStatus = ViewBag.SelectedStatus as string ?? "";
+}
+
+<!-- Filter Form -->
+<form asp-action="Index" method="get" class="row g-3 mb-4">
+
+    <div class="col-md-2">
+        <label for="fromDate" class="form-label">From Date</label>
+        <input type="date" name="fromDate" class="form-control" value="@ViewBag.FromDate" />
+    </div>
+
+    <div class="col-md-2">
+        <label for="toDate" class="form-label">To Date</label>
+        <input type="date" name="toDate" class="form-control" value="@ViewBag.ToDate" />
+    </div>
+    <div class="col-md-2">
+        <label for="patientName" class="form-label">Patient Name</label>
+        <input type="text" name="patientName" class="form-control"
+               placeholder="Enter patient name" value="@ViewBag.PatientName" />
+    </div>
+    <!-- Payment Method Dropdown -->
+    <div class="col-md-2">
+        <label class="form-label">Payment Method</label>
+        <div class="dropdown">
+            <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" id="paymentMethodDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                @(string.IsNullOrEmpty(selectedMethod) ? "All Methods" : selectedMethod)
+            </button>
+            <ul class="dropdown-menu w-100" aria-labelledby="paymentMethodDropdown">
+                <li><a class="dropdown-item" href="#" data-value="">All</a></li>
+                <li><a class="dropdown-item" href="#" data-value="Cash">Cash</a></li>
+                <li><a class="dropdown-item" href="#" data-value="Online">Online</a></li>
+                <li><a class="dropdown-item" href="#" data-value="CashLess">CashLess</a></li>
+            </ul>
+            <input type="hidden" name="paymentMethod" id="paymentMethodInput" value="@selectedMethod" />
+        </div>
+    </div>
+
+    <!-- Status Dropdown -->
+    <div class="col-md-2">
+        <label class="form-label">Status</label>
+        <div class="dropdown">
+            <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" id="statusDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                @(string.IsNullOrEmpty(selectedStatus) ? "All Statuses" : selectedStatus)
+            </button>
+            <ul class="dropdown-menu w-100" aria-labelledby="statusDropdown">
+                <li><a class="dropdown-item" href="#" data-value="">All</a></li>
+                <li><a class="dropdown-item" href="#" data-value="Paid">Paid</a></li>
+                <li><a class="dropdown-item" href="#" data-value="Unpaid">Unpaid</a></li>
+               
+            </ul>
+            <input type="hidden" name="status" id="statusInput" value="@selectedStatus" />
+        </div>
+    </div>
+
+    <!-- Submit & Clear -->
+    <div class="col-md-1 align-self-end">
+        <button type="submit" class="btn btn-primary w-100">Apply</button>
+    </div>
+    <div class="col-md-1 align-self-end">
+        <a href="@Url.Action("Index")" class="btn btn-outline-secondary w-100">Clear</a>
+    </div>
+</form>
+
+<!-- Dashboard Cards -->
+<div class="d-flex flex-row flex-wrap mb-4 justify-content-between">
+
+    <div class="card text-center shadow-sm border-primary flex-fill m-1">
+        <div class="card-body">
+            <h6 class="card-title text-primary">Total Amount</h6>
+            <small class="text-muted">All: ₹@ViewBag.TotalAmount_All</small>
+            <h4 class="text-success">₹@ViewBag.TotalAmount_All</h4>
+        </div>
+    </div>
+
+    <div class="card text-center shadow-sm border-primary flex-fill m-1">
+        <div class="card-body">
+            <h6 class="card-title text-primary">Paid Amount</h6>
+            <small class="text-muted">All: ₹@ViewBag.paidTotalAmount_All</small>
+            <h4 class="text-success">₹@ViewBag.paidTotalAmount_All</h4>
+        </div>
+    </div>
+
+    <div class="card text-center shadow-sm border-primary flex-fill m-1">
+        <div class="card-body">
+            <h6 class="card-title text-danger">Unpaid Amount</h6>
+            <small class="text-muted">All: ₹@ViewBag.UnpaidTotalAmount_All</small>
+            <h4 class="text-danger">₹@ViewBag.UnpaidTotalAmount_All</h4>
+        </div>
+    </div>
+
+    <div class="card text-center shadow-sm border-info flex-fill m-1">
+        <div class="card-body">
+            <h6 class="card-title text-info">Patients</h6>
+            <small class="text-muted">All: @ViewBag.PatientCount_All</small>
+            <h4>@ViewBag.PatientCount_Filtered</h4>
+        </div>
+    </div>
+
+    <div class="card text-center shadow-sm border-success flex-fill m-1">
+        <div class="card-body">
+            <h6 class="card-title text-success">Cash</h6>
+            <small class="text-muted">All: @ViewBag.CashCount_All</small>
+            <h4>@ViewBag.CashCount_Filtered</h4>
+        </div>
+    </div>
+
+    <div class="card text-center shadow-sm border-warning flex-fill m-1">
+        <div class="card-body">
+            <h6 class="card-title text-warning">Online</h6>
+            <small class="text-muted">All: @ViewBag.OnlineCount_All</small>
+            <h4>@ViewBag.OnlineCount_Filtered</h4>
+        </div>
+    </div>
+
+    <div class="card text-center shadow-sm border-danger flex-fill m-1">
+        <div class="card-body">
+            <h6 class="card-title text-danger">Unpaid</h6>
+            <small class="text-muted">All: @ViewBag.UnpaidCount_All</small>
+            <h4>@ViewBag.UnpaidCount_Filtered</h4>
+        </div>
+    </div>
+</div>
+
+<!-- Table: Patients -->
+<h4 class="mt-4">Patients</h4>
+<div class="table-responsive" style="overflow-x:auto;">
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Sample ID</th>
+            <th>Patient ID</th>
+            <th>Patient Name</th>
+            <th>Address</th>
+            <th>Contact NO.</th>
+            <th>Amount</th>
+            <th>Paid</th>
+            <th>Remaining</th>
+            <th>Payment Method</th>
+            <th>Status</th>
+            <th>Prescription Image</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.SampleId</td>
+                <td>@item.PatientId</td>
+                <td>@item.PatientName</td>
+                <td>@item.Address</td>
+                <td>@item.ContactNumber</td>
+                <td>@item.Amount</td>
+                <td>@item.PaidAmount</td>
+                <td>@item.RemaingAmount</td>
+                <td>@item.PaymentMethod</td>
+                <td>@item.Status</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.PrescriptionImgURL))
+                    {
+                        <button type="button" class="btn btn-sm btn-info"
+                                data-bs-toggle="modal"
+                                data-bs-target="#imageModal"
+                                data-img="@item.PrescriptionImgURL">
+                            <i class="fa fa-eye"></i> View
+                        </button>
+                    }
+                    else
+                    {
+                        <span class="text-muted">No Image</span>
+                    }
+                </td>
+                <td>
+                    <a asp-controller="Payment" asp-action="Update" asp-route-paymentId="@item.PaymentId" title="Edit Payment"><i class="fa fa-edit"></i></a>
+                    <a asp-controller="Payment" asp-action="Create" asp-route-patientId="@item.PatientId" class="btn btn-sm btn-success" title="Add New Visit"><i class="fa fa-plus"></i></a>
+
+                   
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="d-flex justify-content-end align-items-center gap-3 mt-3">
+    <!-- Items per page -->
+    <form asp-action="Index" method="get" class="d-flex align-items-center gap-2">
+        <label for="pageSize" class="mb-0">Items per page:</label>
+
+        <select name="pageSize" id="pageSize" class="form-select form-select-sm" style="width:auto;" onchange="this.form.submit()">
+            @foreach (var size in new int[] { 5, 10, 15, 25 })
+            {
+                if (ViewBag.PageSize == size)
+                {
+                    <option value="@size" selected="selected">@size</option>
+                }
+                else
+                {
+                    <option value="@size">@size</option>
+                }
+            }
+        </select>
+
+        <!-- Hidden fields to keep filters when pageSize changes -->
+        <input type="hidden" name="fromDate" value="@ViewBag.FromDate" />
+        <input type="hidden" name="toDate" value="@ViewBag.ToDate" />
+        <input type="hidden" name="patientName" value="@ViewBag.PatientName" />
+        <input type="hidden" name="paymentMethod" value="@ViewBag.SelectedPaymentMethod" />
+        <input type="hidden" name="status" value="@ViewBag.SelectedStatus" />
+    </form>
+
+    <!-- Page info -->
+    <span class="mb-0">Page @ViewBag.CurrentPage of @ViewBag.TotalPages</span>
+
+    <!-- Arrows -->
+    <div class="btn-group" role="group">
+        <a class="btn btn-outline-secondary btn-sm @(ViewBag.CurrentPage == 1 ? "disabled" : "")"
+           href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, pageSize = ViewBag.PageSize,
+                                            fromDate = ViewBag.FromDate, toDate = ViewBag.ToDate,
+                                            patientName = ViewBag.PatientName,
+                                            paymentMethod = ViewBag.SelectedPaymentMethod, status = ViewBag.SelectedStatus })">
+            <i class="fa fa-chevron-left"></i>
+        </a>
+        <a class="btn btn-outline-secondary btn-sm @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")"
+           href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, pageSize = ViewBag.PageSize,
+                                            fromDate = ViewBag.FromDate, toDate = ViewBag.ToDate,
+                                            patientName = ViewBag.PatientName,
+                                            paymentMethod = ViewBag.SelectedPaymentMethod, status = ViewBag.SelectedStatus })">
+            <i class="fa fa-chevron-right"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Bootstrap Modal for Image -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Prescription Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid rounded shadow" alt="Prescription Image" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Payment Method Dropdown Handler
+        document.querySelectorAll('#paymentMethodDropdown + .dropdown-menu .dropdown-item').forEach(item => {
+            item.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.getElementById('paymentMethodInput').value = this.getAttribute('data-value');
+                document.getElementById('paymentMethodDropdown').textContent = this.textContent;
+            });
+        });
+
+        // Status Dropdown Handler
+        document.querySelectorAll('#statusDropdown + .dropdown-menu .dropdown-item').forEach(item => {
+            item.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.getElementById('statusInput').value = this.getAttribute('data-value');
+                document.getElementById('statusDropdown').textContent = this.textContent;
+            });
+        });
+
+        // Image Modal Loader
+        var imageModal = document.getElementById('imageModal');
+        imageModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var imgUrl = button.getAttribute('data-img');
+            var modalImage = imageModal.querySelector('#modalImage');
+            modalImage.src = imgUrl;
+        });
+    </script>
+}
