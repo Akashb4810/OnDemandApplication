@@ -26,63 +26,69 @@
             <button type="submit" class="btn btn-primary w-100">Filter</button>
         </div>
     </form>
-
-    <table class="table table-bordered table-hover">
-        <thead class="table-light">
-            <tr>
-                <th>Date</th>
-                <th>Patient</th>
-                <th>Patient Name</th>
-                <th>Payment ID</th>
-                <th>Paid Amount</th>
-                <th>Method</th>
-                <th>Note</th>
-                <th>Remaining</th>
-                <th>Received By</th>
-                <th>Owner Received?</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var t in Model)
-            {
+    <div class="table-responsive" style="overflow-x: auto;">
+        <table class="table table-bordered table-hover">
+            <thead class="table-light">
                 <tr>
-                    <td>@t.TransactionDate.ToString("dd-MMM-yyyy HH:mm")</td>
-                    <td>@t.PatientId</td>
-                    <td>@t.PatientName</td>
-                    <td>@t.PaymentId</td>
-                    <td>₹@t.PaidAmount</td>
-                    <td>@t.PaymentMethod</td>
-                    <td>@t.Notes</td>
-                    <td>₹@t.RemainingAmount</td>
-                    <td>@t.PaymentRecivedBy</td>
-                    <td>
-                        @if (t.IsReceivedByOwner)
-                        {
-                            <span class="badge bg-success">Yes</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-warning">No</span>
-                        }
-                    </td>
-                    <td>
-                        @if (!t.IsReceivedByOwner)
-                        {
-                            <form asp-action="MarkReceivedByOwner"
-                                  asp-controller="LabOwnerDashboard"
-                                  method="post">
-                                <input type="hidden" name="transactionId" value="@t.TransactionId" />
-                                <input type="hidden" name="assistantId" value="@ViewBag.AssistantId" />
-                                <button type="submit" class="btn btn-sm btn-primary">Mark Received</button>
-                            </form>
-                        }
-                    </td>
+                    <th>Date</th>
+                    <th>Patient</th>
+                    <th>Patient Name</th>
+                    <th>Payment ID</th>
+                    <th>Method</th>
+                    <th>Note</th>
+                    <th>TotalAmount</th>
+                    <th>Bill Amount(AD)</th>
+                    <th>DiscountAmount</th>
+                    <th>Paid Amount</th>
+                    <th>Remaining</th>
+                    <th>Received By</th>
+                    <th>Owner Received?</th>
+                    <th>Action</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-
+            </thead>
+            <tbody>
+                @foreach (var t in Model)
+                {
+                    <tr>
+                        <td>@t.TransactionDate.ToString("dd-MMM-yyyy HH:mm")</td>
+                        <td>@t.PatientId</td>
+                        <td>@t.PatientName</td>
+                        <td>@t.PaymentId</td>
+                        <td>@t.PaymentMethod</td>
+                        <td>@t.Notes</td>
+                        <td>@t.TotalAmount</td>
+                        <td>₹@t.BillAmount</td>
+                        <td>@t.DiscountAmount</td>
+                        <td>₹@t.PaidAmount</td>
+                        <td>₹@t.RemainingAmount</td>
+                        <td>@t.PaymentRecivedBy</td>
+                        <td>
+                            @if (t.IsReceivedByOwner)
+                            {
+                                <span class="badge bg-success">Yes</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning">No</span>
+                            }
+                        </td>
+                        <td>
+                            @if (!t.IsReceivedByOwner)
+                            {
+                                <form asp-action="MarkReceivedByOwner"
+                                      asp-controller="LabOwnerDashboard"
+                                      method="post">
+                                    <input type="hidden" name="transactionId" value="@t.TransactionId" />
+                                    <input type="hidden" name="assistantId" value="@ViewBag.AssistantId" />
+                                    <button type="submit" class="btn btn-sm btn-primary">Mark Received</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
     <!-- Pagination controls -->
     <div class="d-flex justify-content-end align-items-center gap-3 mt-3">
         <!-- Items per page -->

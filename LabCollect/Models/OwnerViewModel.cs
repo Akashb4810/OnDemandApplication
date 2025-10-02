@@ -41,6 +41,10 @@
         public string PaymentRecivedBy { get; set; }
         public bool IsReceivedByOwner { get; set; }
         public decimal RemainingAmount { get; set; }
+        public decimal TotalAmount { get; set; }
+        public decimal DiscountAmount { get; set; }
+        public decimal BillAmount { get; set; }
+
     }
 
     public class UserViewModel

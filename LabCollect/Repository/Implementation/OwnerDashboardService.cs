@@ -111,6 +111,14 @@ namespace LabCollect.Repository.Implementation
                             RemainingAmount = reader.IsDBNull(reader.GetOrdinal("RemainingAmount"))
     ? 0 : reader.GetDecimal(reader.GetOrdinal("RemainingAmount")),
 
+                            TotalAmount = reader.IsDBNull(reader.GetOrdinal("TotalAmount"))
+    ? 0 : reader.GetDecimal(reader.GetOrdinal("TotalAmount")),
+                            DiscountAmount = reader.IsDBNull(reader.GetOrdinal("DiscountAmount"))
+    ? 0 : reader.GetDecimal(reader.GetOrdinal("DiscountAmount")),
+
+                            BillAmount = reader.IsDBNull(reader.GetOrdinal("Amount"))
+    ? 0 : reader.GetDecimal(reader.GetOrdinal("Amount"))
+
                         });
                     }
                 }
