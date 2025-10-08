@@ -58,9 +58,9 @@ namespace LabCollect.Models
         public string PatientName { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public string Gender { get; set; }
-        public string? ContactNumber { get; set; }
+        public string ContactNumber { get; set; }
         public string? Email { get; set; }
-        public string? Address { get; set; }
+        public string Address { get; set; }
 
         public decimal Amount { get; set; }
         public decimal PaidAmount { get; set; }
@@ -69,11 +69,11 @@ namespace LabCollect.Models
         public string? PaymentMethod { get; set; }
         public string Status { get; set; }
         public int? AssistantId { get; set; }
-        public int? SampleId { get; set; }
+        public int SampleId { get; set; }
 
-        public IFormFile? TestImage { get; set; }
-        public string? TestImagePath { get; set; }
-        public string? Notes { get; set; }
+        //public IFormFile TestImage { get; set; }
+        //public string? TestImagePath { get; set; }
+        public string Notes { get; set; }
 
     }
     public class Patient

@@ -4,7 +4,7 @@ namespace LabCollect.Repository.Interface
 {
     public interface IPaymentService
     {
-        bool create(PaymentPatientViewModel paymentViewModel);
+        Task<bool> create(PaymentPatientViewModel paymentViewModel);
         bool Update(PaymentTransactionViewModel paymentViewModel);
         List<PaymentViewModel> GetPaymentsByAssistant(int assistantId);
         PaymentViewModel GetPaymentsByPaymentId(int paymentId, int assistantId);

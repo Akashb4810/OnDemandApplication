@@ -101,7 +101,7 @@ namespace LabCollect.Controllers
 
             // Pagination
             int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
-            var pagedPayments = filteredPayments.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            var pagedPayments = filteredPayments.OrderByDescending(e=>e.CreatedDate).Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
             // Pass data to ViewBag
             ViewBag.TotalRecords = totalRecords;
@@ -121,23 +121,25 @@ namespace LabCollect.Controllers
         [HttpGet]
         public IActionResult CreatePayment()
         {
+            if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
+                return RedirectToAction("Login", "Account");
             return View(new PaymentPatientViewModel());
         }
-        [HttpPost]
-        public IActionResult CreatePayment(PaymentPatientViewModel model)
-        {
-            if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value==null)
-                return RedirectToAction("Login", "Account");
+        //[HttpPost]
+        //public IActionResult CreatePayment(PaymentPatientViewModel model)
+        //{
+        //    if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value==null)
+        //        return RedirectToAction("Login", "Account");
 
-            model.AssistantId =int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value); 
+        //    model.AssistantId =int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value); 
 
-            if (!ModelState.IsValid)
-                return View(model);
+        //    if (!ModelState.IsValid)
+        //        return View(model);
 
-            bool success = _paymentService.create(model);
-            TempData["Msg"] = success ? "Payment saved successfully!" : "Error saving payment!";
-            return RedirectToAction("Index");
-        }
+        //    bool success = _paymentService.create(model);
+        //    TempData["Msg"] = success ? "Payment saved successfully!" : "Error saving payment!";
+        //    return RedirectToAction("Index");
+        //}
 
         public IActionResult Dashboard(DateTime? fromDate, DateTime? toDate)
         {
@@ -159,6 +161,9 @@ namespace LabCollect.Controllers
 
         public IActionResult RemainingPayments(DateTime? fromDate, DateTime? toDate, int page = 1, int pageSize = 10)
         {
+            if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
+                return RedirectToAction("Login", "Account");
+
             int assistantId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value); 
 
             if (!fromDate.HasValue) fromDate = DateTime.Today;
@@ -205,6 +210,8 @@ namespace LabCollect.Controllers
         [Route("PaidPayments")]
         public IActionResult PaidPayments(DateTime? fromDate, DateTime? toDate, int page = 1, int pageSize = 10)
         {
+            if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
+                return RedirectToAction("Login", "Account");
             int assistantId = 0;
             int? userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
@@ -241,6 +248,8 @@ namespace LabCollect.Controllers
         [Route("OnlinePayments")]
         public IActionResult OnlinePayments(DateTime? fromDate, DateTime? toDate, int page = 1, int pageSize = 10)
         {
+            if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
+                return RedirectToAction("Login", "Account");
             int assistantId = 0;
             int? userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
@@ -277,6 +286,8 @@ namespace LabCollect.Controllers
         [Route("CashPayments")]
         public IActionResult CashPayments(DateTime? fromDate, DateTime? toDate, int page = 1, int pageSize = 10)
         {
+            if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
+                return RedirectToAction("Login", "Account");
             int assistantId = 0;
             int? userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 

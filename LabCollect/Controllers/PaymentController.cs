@@ -21,7 +21,10 @@ namespace LabCollect.Controllers
         [HttpGet]
         public IActionResult Create(int patientId=0)
         {
-            if(patientId>0 )
+            if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
+                return RedirectToAction("Login", "Account");
+
+            if (patientId>0 )
             {
                 var patient = _patientService.GetPatientById(patientId);
                 PaymentPatientViewModel paymentPatientViewModel= new PaymentPatientViewModel();
@@ -42,7 +45,7 @@ namespace LabCollect.Controllers
         [HttpPost]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(PaymentPatientViewModel model)
+        public async Task<IActionResult> Create(PaymentPatientViewModel model)
         {
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
             {
@@ -59,30 +62,30 @@ namespace LabCollect.Controllers
             }
 
             // Handle Test Image Upload
-            if (model.TestImage != null && model.TestImage.Length > 0)
-            {
-                // Create folder if not exists
-                var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/tests");
-                if (!Directory.Exists(uploadDir))
-                {
-                    Directory.CreateDirectory(uploadDir);
-                }
+            //if (model.TestImage != null && model.TestImage.Length > 0)
+            //{
+            //    // Create folder if not exists
+            //    var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/tests");
+            //    if (!Directory.Exists(uploadDir))
+            //    {
+            //        Directory.CreateDirectory(uploadDir);
+            //    }
 
-                // Unique file name
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.TestImage.FileName);
-                var filePath = Path.Combine(uploadDir, fileName);
+            //    // Unique file name
+            //    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.TestImage.FileName);
+            //    var filePath = Path.Combine(uploadDir, fileName);
 
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    model.TestImage.CopyTo(stream);
-                }
+            //    using (var stream = new FileStream(filePath, FileMode.Create))
+            //    {
+            //        model.TestImage.CopyTo(stream);
+            //    }
 
-                // Save path (relative to wwwroot)
-                model.TestImagePath = "/uploads/tests/" + fileName;
-            }
+            //    // Save path (relative to wwwroot)
+            //    model.TestImagePath = "/uploads/tests/" + fileName;
+            //}
 
             // Save Payment Data
-            var result = _paymentService.create(model);
+            var result =await _paymentService.create(model);
             if (!result)
             {
                 ViewBag.Error = "Error saving payment. Please try again.";
@@ -141,6 +144,7 @@ namespace LabCollect.Controllers
         [HttpGet]
         public JsonResult SearchPatients(string term)
         {
+
             var patients = _patientService.SearchPatientsByName(term);
             var result = patients.Select(p => new
             {

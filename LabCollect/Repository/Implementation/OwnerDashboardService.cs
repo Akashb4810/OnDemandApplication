@@ -2,6 +2,8 @@
 using LabCollect.Repository.Interface;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace LabCollect.Repository.Implementation
 {
@@ -149,7 +151,7 @@ namespace LabCollect.Repository.Implementation
 
                 // Input parameters – handle NULLs with DBNull.Value
                 cmd.Parameters.AddWithValue("@UserName", model.UserName);
-                cmd.Parameters.AddWithValue("@PasswordHash", model.PasswordHash);
+                cmd.Parameters.AddWithValue("@PasswordHash", HashPassword(model.PasswordHash));
                 cmd.Parameters.AddWithValue("@RoleId", model.RoleId);
                 cmd.Parameters.AddWithValue("@AppTypeId", model.AppTypeId);
                 cmd.Parameters.AddWithValue("@FullName", (object?)model.FullName ?? DBNull.Value);
@@ -178,6 +180,20 @@ namespace LabCollect.Repository.Implementation
                 }
             }
         }
+        public static string HashPassword(string password)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    sb.Append(bytes[i].ToString("x2"));
+                }
+                return sb.ToString();
+            }
+        }
+
 
     }
 

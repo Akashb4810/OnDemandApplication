@@ -74,6 +74,7 @@
                             <span class="input-group-text"><i class="bi bi-telephone"></i></span>
                             <input asp-for="ContactNumber" class="form-control" placeholder="Enter Contact Number" />
                         </div>
+                        <span asp-validation-for="ContactNumber" class="text-danger"></span>
                     </div>
 
                     <div class="col-md-6">
@@ -87,6 +88,7 @@
                     <div class="col-12">
                         <label asp-for="Address" class="form-label fw-semibold">Address</label>
                         <textarea asp-for="Address" rows="2" class="form-control" placeholder="Enter Address"></textarea>
+                        <span asp-validation-for="Address" class="text-danger"></span>
                     </div>
                 </div>
 
@@ -159,7 +161,7 @@
                         <span asp-validation-for="Notes" class="text-danger"></span>
                     </div>
 
-                    <div class="col-md-12">
+@*                     <div class="col-md-12">
                         <label asp-for="TestImage" class="form-label fw-semibold">Upload Test Image</label>
                         <input asp-for="TestImage" type="file" class="form-control" id="TestImage" accept="image/*" onchange="previewImage(event)" />
                         <span asp-validation-for="TestImage" class="text-danger"></span>
@@ -169,15 +171,16 @@
                             <img id="ImagePreview" src="#" alt="Preview" class="img-fluid rounded shadow-sm d-none" style="max-height:200px;" />
                         </div>
                     </div>
-                </div>
+ *@                </div>
 
                 <!-- Hidden Assistant ID -->
                 <input asp-for="AssistantId" type="hidden" />
 
                 <!-- Submit Button -->
                 <div class="d-grid mt-4">
-                    <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm">
-                        <i class="bi bi-save me-1"></i> Save Payment
+                    <button type="submit" id="btnSubmit" class="btn btn-primary btn-lg fw-bold shadow-sm">
+                        <span id="btnText"><i class="bi bi-save me-1"></i> Save Payment</span>
+                        <span id="btnLoader" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
                     </button>
                 </div>
             </form>
@@ -211,5 +214,15 @@
             }
             reader.readAsDataURL(event.target.files[0]);
         }
+
+        document.querySelector("form").addEventListener("submit", function () {
+            const btn = document.getElementById("btnSubmit");
+            const btnText = document.getElementById("btnText");
+            const btnLoader = document.getElementById("btnLoader");
+
+            btn.disabled = true;
+            btnText.textContent = "Saving...";
+            btnLoader.classList.remove("d-none");
+        });
     </script>
 }

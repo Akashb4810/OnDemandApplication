@@ -11,6 +11,7 @@ namespace LabCollect.Controllers
 
         public IActionResult CreateUsers()
         {
+
             return View();
         }
 

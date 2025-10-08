@@ -1,4 +1,5 @@
-﻿using LabCollect.Models;
+﻿using System.Security.Claims;
+using LabCollect.Models;
 using LabCollect.Repository.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -16,6 +17,9 @@ namespace LabCollect.Controllers
 
         public IActionResult Index(DateTime? startDate, DateTime? endDate, string paymentReceivedBy)
         {
+            if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
+                return RedirectToAction("Login", "Account");
+
             if (!startDate.HasValue)
                 startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
             if (!endDate.HasValue)
@@ -31,6 +35,9 @@ namespace LabCollect.Controllers
         [Route("Transactions")]
         public IActionResult Transactions(int assistantId, DateTime? startDate, DateTime? endDate, string paymentReceivedBy, int page = 1, int pageSize = 10)
         {
+            if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
+                return RedirectToAction("Login", "Account");
+
             if (!startDate.HasValue) startDate = DateTime.Today.AddDays(-30); // default last 30 days
             if (!endDate.HasValue) endDate = DateTime.Today;
 
@@ -57,6 +64,9 @@ namespace LabCollect.Controllers
         [HttpPost]
         public IActionResult MarkReceivedByOwner(int transactionId, int assistantId, DateTime? startDate, DateTime? endDate, string paymentReceivedBy)
         {
+            if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
+                return RedirectToAction("Login", "Account");
+
             _ownerDashboardService.MarkReceivedByOwner(transactionId);
             return RedirectToAction("Transactions", new { assistantId, startDate, endDate, paymentReceivedBy });
         }
@@ -65,7 +75,8 @@ namespace LabCollect.Controllers
         public IActionResult Create()
         {
             var model = new UserViewModel();
-
+            if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
+                return RedirectToAction("Login", "Account");
             // Load dropdown data
             ViewBag.Roles = GetRoles();       // List<SelectListItem>
             ViewBag.AppTypes = GetAppTypes(); // List<SelectListItem>
@@ -77,6 +88,8 @@ namespace LabCollect.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(UserViewModel model)
         {
+            if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
+                return RedirectToAction("Login", "Account");
             ViewBag.Roles = GetRoles();
             ViewBag.AppTypes = GetAppTypes();
 

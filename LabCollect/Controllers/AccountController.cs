@@ -71,9 +71,9 @@ namespace LabCollect.Controllers
             // 3. Redirect by role/app type
             if (user.AppTypeName == "Lab")
             {
-                if (user.RoleName == "Owner")
+                if (user.RoleName.Equals("Owner", StringComparison.OrdinalIgnoreCase))
                     return RedirectToAction("Index", "LabOwnerDashboard");
-                else if (user.RoleName == "Assistant")
+                else if (user.RoleName.Equals("Assistant"));
                     return RedirectToAction("Index", "Assistant");
             }
             else if (user.AppTypeName == "Dairy")

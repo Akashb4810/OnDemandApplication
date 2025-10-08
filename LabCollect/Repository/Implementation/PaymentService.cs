@@ -16,7 +16,7 @@ namespace LabCollect.Repository.Implementation
 
 
 
-        public bool create(PaymentPatientViewModel model)
+        public async Task<bool> create(PaymentPatientViewModel model)
         {
            // newPaymentId = 0; // default if fails
 
@@ -42,7 +42,7 @@ namespace LabCollect.Repository.Implementation
                 cmd.Parameters.AddWithValue("@Status", model.Status);
                 cmd.Parameters.AddWithValue("@AssistantId", (object?)model.AssistantId ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@SampleId", (object?)model.SampleId ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@PrescriptionImgURL", model.TestImagePath);
+                cmd.Parameters.AddWithValue("@PrescriptionImgURL", "");
                 cmd.Parameters.AddWithValue("@Notes", model.Notes);
 
                 // Output parameters
@@ -58,8 +58,8 @@ namespace LabCollect.Repository.Implementation
                 };
                 cmd.Parameters.Add(newPaymentIdParam);
 
-                conn.Open();
-                cmd.ExecuteNonQuery();
+               await conn.OpenAsync();
+               await cmd.ExecuteNonQueryAsync();
 
                 // Read output parameters
                 bool isSuccess = Convert.ToBoolean(isSuccessParam.Value);
