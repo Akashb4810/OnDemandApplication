@@ -14,7 +14,7 @@ namespace LabCollect.Repository.Implementation
         {
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
-        public OwnerDashboardViewModel GetOwnerDashboardSummary(DateTime? startDate, DateTime? endDate, string paymentReceivedBy)
+        public async Task<OwnerDashboardViewModel> GetOwnerDashboardSummary(DateTime? startDate, DateTime? endDate, string paymentReceivedBy)
         {
             var summaries = new List<AssistantPaymentSummary>();
 
@@ -62,7 +62,7 @@ namespace LabCollect.Repository.Implementation
             };
         }
 
-        public List<TransactionDetail> GetAssistantPaymentTransactions(int assistantId, DateTime? startDate, DateTime? endDate, string paymentReceivedBy)
+        public async Task<List<TransactionDetail>> GetAssistantPaymentTransactions(int assistantId, DateTime? startDate, DateTime? endDate, string paymentReceivedBy)
         {      
             var transactions = new List<TransactionDetail>();
 
@@ -75,10 +75,10 @@ namespace LabCollect.Repository.Implementation
                 cmd.Parameters.AddWithValue("@EndDate", (object?)endDate ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@PaymentReceivedBy", string.IsNullOrEmpty(paymentReceivedBy) ? (object)DBNull.Value : paymentReceivedBy);
 
-                conn.Open();
-                using (SqlDataReader reader = cmd.ExecuteReader())
+                await conn.OpenAsync();
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         transactions.Add(new TransactionDetail
                         {
@@ -131,14 +131,14 @@ namespace LabCollect.Repository.Implementation
             return transactions;
         }
 
-        public void MarkReceivedByOwner(int transactionId)
+        public async Task MarkReceivedByOwner(int transactionId)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             using (SqlCommand cmd = new SqlCommand("UPDATE PaymentTransactions SET IsReceivedByOwner = 1 WHERE TransactionId = @TransactionId", conn))
             {
                 cmd.Parameters.AddWithValue("@TransactionId", transactionId);
-                conn.Open();
-                cmd.ExecuteNonQuery();
+                await conn.OpenAsync();
+                await cmd.ExecuteNonQueryAsync();
             }
         }
 

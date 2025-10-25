@@ -19,7 +19,7 @@ namespace LabCollect.Repository.Implementation
         }
 
 
-        public List<AppTypeViewModel> GetAppTypes()
+        public async Task<List<AppTypeViewModel>> GetAppTypes()
         {
             var list = new List<AppTypeViewModel>();
 
@@ -28,9 +28,9 @@ namespace LabCollect.Repository.Implementation
                 using (SqlCommand cmd = new SqlCommand("sp_GetAppTypes", conn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
-                    conn.Open();
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    while (reader.Read())
+                    await conn.OpenAsync();
+                    SqlDataReader reader =await cmd.ExecuteReaderAsync();
+                    while (await reader.ReadAsync())
                     {
                         list.Add(new AppTypeViewModel
                         {

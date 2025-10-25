@@ -10,6 +10,7 @@ using System.IO;
 using LabCollect.Repository.Implementation;
 using Rotativa;
 using Rotativa.AspNetCore;
+using System.Threading.Tasks;
 
 
 namespace LabCollect.Controllers
@@ -25,7 +26,7 @@ namespace LabCollect.Controllers
             _paymentService = paymentService;
         }
 
-        public IActionResult Index(DateTime? startDate, DateTime? endDate, string paymentReceivedBy)
+        public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate, string paymentReceivedBy)
         {
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
                 return RedirectToAction("Login", "Account");
@@ -35,7 +36,7 @@ namespace LabCollect.Controllers
             if (!endDate.HasValue)
                 endDate = DateTime.Now;
 
-            var viewModel = _ownerDashboardService.GetOwnerDashboardSummary(startDate, endDate, paymentReceivedBy);
+            var viewModel =await _ownerDashboardService.GetOwnerDashboardSummary(startDate, endDate, paymentReceivedBy);
             ViewBag.StartDate = viewModel.StartDate.ToString("yyyy-MM-dd");
             ViewBag.EndDate = viewModel.EndDate.ToString("yyyy-MM-dd");
             ViewBag.PaymentReceivedBy = paymentReceivedBy;
@@ -43,7 +44,7 @@ namespace LabCollect.Controllers
         }
 
         [Route("Transactions")]
-        public IActionResult Transactions(int assistantId, DateTime? startDate, DateTime? endDate, string paymentReceivedBy, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> Transactions(int assistantId, DateTime? startDate, DateTime? endDate, string paymentReceivedBy, int page = 1, int pageSize = 10)
         {
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
                 return RedirectToAction("Login", "Account");
@@ -51,7 +52,7 @@ namespace LabCollect.Controllers
             if (!startDate.HasValue) startDate = DateTime.Today.AddDays(-30); // default last 30 days
             if (!endDate.HasValue) endDate = DateTime.Today;
 
-            var transactions = _ownerDashboardService.GetAssistantPaymentTransactions(
+            var transactions =await _ownerDashboardService.GetAssistantPaymentTransactions(
                 assistantId, startDate, endDate, paymentReceivedBy);
 
             // pagination
@@ -72,17 +73,17 @@ namespace LabCollect.Controllers
         }
 
         [HttpPost]
-        public IActionResult MarkReceivedByOwner(int transactionId, int assistantId, DateTime? startDate, DateTime? endDate, string paymentReceivedBy)
+        public async Task<IActionResult> MarkReceivedByOwner(int transactionId, int assistantId, DateTime? startDate, DateTime? endDate, string paymentReceivedBy)
         {
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
                 return RedirectToAction("Login", "Account");
 
-            _ownerDashboardService.MarkReceivedByOwner(transactionId);
+            await _ownerDashboardService.MarkReceivedByOwner(transactionId);
             return RedirectToAction("Transactions", new { assistantId, startDate, endDate, paymentReceivedBy });
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var model = new UserViewModel();
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
@@ -96,7 +97,7 @@ namespace LabCollect.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(UserViewModel model)
+        public async Task<IActionResult> Create(UserViewModel model)
         {
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
                 return RedirectToAction("Login", "Account");
@@ -139,12 +140,12 @@ namespace LabCollect.Controllers
 
 
 
-        public IActionResult ExportToPdf(DateTime? startDate, DateTime? endDate, string? paymentReceivedBy)
+        public async Task<IActionResult> ExportToPdf(DateTime? startDate, DateTime? endDate, string? paymentReceivedBy)
         {
             // 1. Get main dashboard data
-            var model = _ownerDashboardService.GetOwnerDashboardSummary(startDate, endDate, paymentReceivedBy);
+            var model =await _ownerDashboardService.GetOwnerDashboardSummary(startDate, endDate, paymentReceivedBy);
 
-            var paymentsDetails= _paymentService.GetPaymentsByAssistant(0);
+            var paymentsDetails=await _paymentService.GetPaymentsByAssistant(0);
             // 2. Add patient-level details for each assistant
             foreach (var assistant in model.AssistantSummaries)
             {
@@ -169,13 +170,13 @@ namespace LabCollect.Controllers
 
         }
 
-        public IActionResult ExportToPdfAsPaymentList(DateTime? startDate, DateTime? endDate, string? paymentReceivedBy)
+        public async Task<IActionResult> ExportToPdfAsPaymentList(DateTime? startDate, DateTime? endDate, string? paymentReceivedBy)
         {
             // 1. Get main dashboard data
            // var model = _ownerDashboardService.GetOwnerDashboardSummary(startDate, endDate, paymentReceivedBy);
 
-            var paymentsDetails = _paymentService.GetPaymentsByAssistant(0).OrderByDescending(e => e.SampleId).ToList();
-
+            var paymentsDetails =await _paymentService.GetPaymentsByAssistant(0);
+            paymentsDetails.OrderByDescending(e => e.SampleId);
                 if (startDate.HasValue)
                 paymentsDetails = paymentsDetails.Where(p => p.CreatedDate.Date >= startDate.Value.Date).ToList();
                 if (endDate.HasValue)

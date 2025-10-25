@@ -99,14 +99,14 @@ namespace LabCollect.Controllers
 
 
         [HttpGet("Payment/Update")]
-        public IActionResult Update(int paymentId)
+        public async Task<IActionResult> Update(int paymentId)
         {
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
             {
                 return RedirectToAction("Login", "Account");
             }
             int assistantId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            var paymentinfo=_paymentService.GetPaymentsByPaymentId(paymentId, assistantId);
+            var paymentinfo=await _paymentService.GetPaymentsByPaymentId(paymentId, assistantId);
             PaymentTransactionViewModel paymentTransactionViewModel = new PaymentTransactionViewModel();
             paymentTransactionViewModel.PaymentId = paymentId;
             paymentTransactionViewModel.TransactionDate = DateTime.Now;
@@ -117,7 +117,7 @@ namespace LabCollect.Controllers
         }
 
         [HttpPost]
-        public IActionResult Update(PaymentTransactionViewModel model)
+        public async Task<IActionResult> Update(PaymentTransactionViewModel model)
         {
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
             {
@@ -133,7 +133,7 @@ namespace LabCollect.Controllers
                 return View(model);
             }
             model.RemaingAmount = model.RemaingAmount - model.PaidAmount;
-            var result = _paymentService.Update(model);
+            var result =await _paymentService.Update(model);
             if (!result)
             {
                 ViewBag.Error = "Error saving payment. Please try again.";

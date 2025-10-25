@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Threading.Tasks;
 using LabCollect.Models;
 using LabCollect.Repository.Interface;
 using Microsoft.Data.SqlClient;
@@ -71,7 +72,7 @@ namespace LabCollect.Repository.Implementation
             return false;
         }
 
-        public List<PaymentViewModel> GetPaymentsByAssistant(int assistantId)
+        public async Task<List<PaymentViewModel>> GetPaymentsByAssistant(int assistantId)
         {
             var list = new List<PaymentViewModel>();
 
@@ -79,9 +80,9 @@ namespace LabCollect.Repository.Implementation
             using SqlCommand cmd = new SqlCommand("sp_GetPaymentsByAssistant", conn);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("@AssistantId", assistantId);
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
+            await conn.OpenAsync();
+            SqlDataReader reader =await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
             {
                 list.Add(new PaymentViewModel
                 {
@@ -105,7 +106,7 @@ namespace LabCollect.Repository.Implementation
             return list;
         }
 
-        public PaymentViewModel GetPaymentsByPaymentId(int paymentId,int assistantId)
+        public async Task<PaymentViewModel> GetPaymentsByPaymentId(int paymentId,int assistantId)
         {
             var paymentViewModel = new PaymentViewModel();
 
@@ -114,9 +115,9 @@ namespace LabCollect.Repository.Implementation
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("@PaymentId", paymentId);
             //cmd.Parameters.AddWithValue("@SampleId", paymentId);
-            conn.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
+            await conn.OpenAsync();
+            SqlDataReader reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
             {
                 paymentViewModel = new PaymentViewModel
                 {
@@ -136,7 +137,7 @@ namespace LabCollect.Repository.Implementation
             return paymentViewModel;
         }
 
-        public bool Update(PaymentTransactionViewModel paymentViewModel)
+        public async Task<bool> Update(PaymentTransactionViewModel paymentViewModel)
         {
            int newTransactionId = 0; // initialize output
 
@@ -176,8 +177,8 @@ namespace LabCollect.Repository.Implementation
                     cmd.Parameters.Add(isSuccessParam);
 
                     // Execute
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
+                    await conn.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
 
                     // Get outputs
                     bool isSuccess = (isSuccessParam.Value != DBNull.Value) &&
@@ -193,7 +194,7 @@ namespace LabCollect.Repository.Implementation
             }
         }
 
-        public AssistantDashboardViewModel GetAssistantDashboardSummary(int assistantId, DateTime? fromDate, DateTime? toDate)
+        public async Task<AssistantDashboardViewModel> GetAssistantDashboardSummary(int assistantId, DateTime? fromDate, DateTime? toDate)
         {
             var model = new AssistantDashboardViewModel();
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -204,8 +205,8 @@ namespace LabCollect.Repository.Implementation
                 cmd.Parameters.AddWithValue("@FromDate", fromDate);
                 cmd.Parameters.AddWithValue("@ToDate", toDate);
 
-                conn.Open();
-                using (SqlDataReader reader = cmd.ExecuteReader())
+                await conn.OpenAsync();
+                using (SqlDataReader reader =  await cmd.ExecuteReaderAsync())
                 {
                     if (reader.Read()) model.TotalPatients = reader.IsDBNull(0) ? 0 : reader.GetInt32(0);
                     reader.NextResult();
@@ -222,19 +223,19 @@ namespace LabCollect.Repository.Implementation
         }
 
 
-        public List<PaymentViewModel> GetRemainingPaymentsByAssistant(int assistantId, DateTime? fromDate, DateTime? toDate)
-     => GetPayments("sp_GetRemainingPaymentsByAssistant", assistantId, fromDate, toDate);
+        public async Task<List<PaymentViewModel>> GetRemainingPaymentsByAssistant(int assistantId, DateTime? fromDate, DateTime? toDate)
+     =>await GetPayments("sp_GetRemainingPaymentsByAssistant", assistantId, fromDate, toDate);
 
-        public List<PaymentViewModel> GetPaidPaymentsByAssistant(int assistantId, DateTime? fromDate, DateTime? toDate)
-            => GetPayments("sp_GetPaidPaymentsByAssistant", assistantId, fromDate, toDate);
+        public async Task<List<PaymentViewModel>> GetPaidPaymentsByAssistant(int assistantId, DateTime? fromDate, DateTime? toDate)
+            => await GetPayments("sp_GetPaidPaymentsByAssistant", assistantId, fromDate, toDate);
 
-        public List<PaymentViewModel> GetOnlinePaymentsByAssistant(int assistantId, DateTime? fromDate, DateTime? toDate)
-            => GetPayments("sp_GetOnlinePaymentsByAssistant", assistantId, fromDate, toDate);
+        public async Task<List<PaymentViewModel>> GetOnlinePaymentsByAssistant(int assistantId, DateTime? fromDate, DateTime? toDate)
+            => await GetPayments("sp_GetOnlinePaymentsByAssistant", assistantId, fromDate, toDate);
 
-        public List<PaymentViewModel> GetCashPaymentsByAssistant(int assistantId, DateTime? fromDate, DateTime? toDate)
-            => GetPayments("sp_GetCashPaymentsByAssistant", assistantId, fromDate, toDate);
+        public async Task<List<PaymentViewModel>> GetCashPaymentsByAssistant(int assistantId, DateTime? fromDate, DateTime? toDate)
+            => await GetPayments("sp_GetCashPaymentsByAssistant", assistantId, fromDate, toDate);
 
-        private List<PaymentViewModel> GetPayments(string spName, int assistantId, DateTime? fromDate, DateTime? toDate)
+        private async Task<List<PaymentViewModel>> GetPayments(string spName, int assistantId, DateTime? fromDate, DateTime? toDate)
         {
             var list = new List<PaymentViewModel>();
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -245,10 +246,10 @@ namespace LabCollect.Repository.Implementation
                 cmd.Parameters.AddWithValue("@FromDate", fromDate);
                 cmd.Parameters.AddWithValue("@ToDate", toDate);
 
-                conn.Open();
-                using (SqlDataReader reader = cmd.ExecuteReader())
+                await conn.OpenAsync();
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         list.Add(new PaymentViewModel
                         {

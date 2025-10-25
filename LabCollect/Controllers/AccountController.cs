@@ -19,21 +19,21 @@ namespace LabCollect.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login()
+        public async Task<IActionResult> Login()
         {
             // Load AppTypes dynamically from DB
             var model = new LoginViewModel();
-            model.AppTypes = _userService.GetAppTypes();
+            model.AppTypes =await _userService.GetAppTypes();
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken] // <-- CSRF protection
-        public IActionResult Login(LoginViewModel model)
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                model.AppTypes = _userService.GetAppTypes();
+                model.AppTypes =await _userService.GetAppTypes();
                 return View(model);
             }
 
@@ -43,7 +43,7 @@ namespace LabCollect.Controllers
             if (user == null)
             {
                 ViewBag.Error = "Invalid username/password or app type.";
-                model.AppTypes = _userService.GetAppTypes();
+                model.AppTypes =await _userService.GetAppTypes();
                 return View(model);
             }
 
@@ -63,7 +63,7 @@ namespace LabCollect.Controllers
                 ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
             };
 
-            HttpContext.SignInAsync(
+           await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties);

@@ -17,7 +17,7 @@ namespace LabCollect.Controllers
 
         public IActionResult Dashboard()
         {
-            return View();
+            return View(); 
         }
     }
 }

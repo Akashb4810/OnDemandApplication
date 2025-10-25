@@ -24,7 +24,7 @@ namespace LabCollect.Controllers
         //    var payments = _paymentService.GetPaymentsByAssistant(assistantId);
         //    return View(payments);
         //}
-        public IActionResult Index(DateTime? fromDate, DateTime? toDate, string paymentMethod, string status,string patientName, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> Index(DateTime? fromDate, DateTime? toDate, string paymentMethod, string status,string patientName, int page = 1, int pageSize = 10)
         {
             int assistantId = 0;
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value==null)
@@ -40,7 +40,7 @@ namespace LabCollect.Controllers
             //int assistantId = Convert.ToInt32(HttpContext.Session.GetString("UserId"));
 
             // 1. All payments (no filter)
-            var allPayments = _paymentService.GetPaymentsByAssistant(assistantId);
+            var allPayments =await _paymentService.GetPaymentsByAssistant(assistantId);
 
             // 2. Apply filters
             var filteredPayments = allPayments;
@@ -119,7 +119,7 @@ namespace LabCollect.Controllers
         }
 
         [HttpGet]
-        public IActionResult CreatePayment()
+        public async Task<IActionResult> CreatePayment()
         {
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
                 return RedirectToAction("Login", "Account");
@@ -141,7 +141,7 @@ namespace LabCollect.Controllers
         //    return RedirectToAction("Index");
         //}
 
-        public IActionResult Dashboard(DateTime? fromDate, DateTime? toDate)
+        public async Task<IActionResult> Dashboard(DateTime? fromDate, DateTime? toDate)
         {
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
                 return RedirectToAction("Login", "Account");
@@ -152,14 +152,14 @@ namespace LabCollect.Controllers
             if (!fromDate.HasValue) fromDate = DateTime.Today;
             if (!toDate.HasValue) toDate = DateTime.Today;
 
-            var summary = _paymentService.GetAssistantDashboardSummary(assistantId, fromDate.Value, toDate.Value);
+            var summary =await _paymentService.GetAssistantDashboardSummary(assistantId, fromDate.Value, toDate.Value);
             ViewBag.FromDate = fromDate.Value.ToString("yyyy-MM-dd");
             ViewBag.ToDate = toDate.Value.ToString("yyyy-MM-dd");
 
             return View(summary);
         }
 
-        public IActionResult RemainingPayments(DateTime? fromDate, DateTime? toDate, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> RemainingPayments(DateTime? fromDate, DateTime? toDate, int page = 1, int pageSize = 10)
         {
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
                 return RedirectToAction("Login", "Account");
@@ -169,7 +169,7 @@ namespace LabCollect.Controllers
             if (!fromDate.HasValue) fromDate = DateTime.Today;
             if (!toDate.HasValue) toDate = DateTime.Today;
 
-            var list = _paymentService.GetRemainingPaymentsByAssistant(assistantId, fromDate.Value, toDate.Value);
+            var list =await _paymentService.GetRemainingPaymentsByAssistant(assistantId, fromDate.Value, toDate.Value);
 
             // Pagination logic
             int totalRecords = list.Count;
@@ -208,7 +208,7 @@ namespace LabCollect.Controllers
         // Repeat similar for PaidPayments, OnlinePayments, CashPayments
 
         [Route("PaidPayments")]
-        public IActionResult PaidPayments(DateTime? fromDate, DateTime? toDate, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> PaidPayments(DateTime? fromDate, DateTime? toDate, int page = 1, int pageSize = 10)
         {
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
                 return RedirectToAction("Login", "Account");
@@ -223,7 +223,7 @@ namespace LabCollect.Controllers
             if (!fromDate.HasValue) fromDate = DateTime.Today;
             if (!toDate.HasValue) toDate = DateTime.Today;
 
-            var list = _paymentService.GetPaidPaymentsByAssistant(assistantId, fromDate, toDate);
+            var list =await _paymentService.GetPaidPaymentsByAssistant(assistantId, fromDate, toDate);
 
             // Pagination logic
             int totalRecords = list.Count;
@@ -246,7 +246,7 @@ namespace LabCollect.Controllers
         }
 
         [Route("OnlinePayments")]
-        public IActionResult OnlinePayments(DateTime? fromDate, DateTime? toDate, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> OnlinePayments(DateTime? fromDate, DateTime? toDate, int page = 1, int pageSize = 10)
         {
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
                 return RedirectToAction("Login", "Account");
@@ -261,7 +261,7 @@ namespace LabCollect.Controllers
             if (!fromDate.HasValue) fromDate = DateTime.Today;
             if (!toDate.HasValue) toDate = DateTime.Today;
 
-            var list = _paymentService.GetOnlinePaymentsByAssistant(assistantId, fromDate, toDate);
+            var list =await _paymentService.GetOnlinePaymentsByAssistant(assistantId, fromDate, toDate);
 
             // Pagination logic
             int totalRecords = list.Count;
@@ -284,7 +284,7 @@ namespace LabCollect.Controllers
         }
 
         [Route("CashPayments")]
-        public IActionResult CashPayments(DateTime? fromDate, DateTime? toDate, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> CashPayments(DateTime? fromDate, DateTime? toDate, int page = 1, int pageSize = 10)
         {
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
                 return RedirectToAction("Login", "Account");
@@ -298,7 +298,7 @@ namespace LabCollect.Controllers
             if (!fromDate.HasValue) fromDate = DateTime.Today;
             if (!toDate.HasValue) toDate = DateTime.Today;
 
-            var list = _paymentService.GetCashPaymentsByAssistant(assistantId, fromDate, toDate);
+            var list =await _paymentService.GetCashPaymentsByAssistant(assistantId, fromDate, toDate);
 
             // pagination
             int totalRecords = list.Count;
