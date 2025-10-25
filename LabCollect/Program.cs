@@ -29,6 +29,9 @@ builder.Services.AddTransient<IPatientService, PatientService>();
 //builder.Services.AddTransient<IAccountService, AccountService>();
 var app = builder.Build();
 
+var env = app.Environment;
+Rotativa.AspNetCore.RotativaConfiguration.Setup(env.WebRootPath, "Rotativa");
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -49,5 +52,7 @@ app.UseHttpsRedirection();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
 
 app.Run();

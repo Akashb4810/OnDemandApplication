@@ -9,15 +9,18 @@
         public string AssistantName { get; set; }
         public int PatientCount { get; set; }
         public decimal TotalPaymentCollected { get; set; }
+        public decimal TotalBillPayment { get; set; }
         public decimal TotalRemainingAmount { get; set; }
         public decimal TotalReceivedByOwner { get; set; }
         public decimal TotalUnpaidToOwner { get; set; }
+        public List<PaymentViewModel>? PatientPayments { get; set; }
     }
 
     public class OwnerDashboardViewModel
     {
         public List<AssistantPaymentSummary> AssistantSummaries { get; set; }
         public decimal TotalPayment { get; set; }
+        public decimal TotalBillPayment { get; set; }
         public decimal TotalRemaining { get; set; }
         public decimal TotalUnpaidToOwner { get; set; }
         public decimal TotalReceivedByOwner { get; set; }

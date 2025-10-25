@@ -1,10 +1,11 @@
-﻿using LabCollect.Models;
+﻿using System.Data;
+using LabCollect.Models;
 using LabCollect.Repository.Interface;
 using Microsoft.Data.SqlClient;
 
 namespace LabCollect.Repository.Implementation
 {
-    public class PatientService:IPatientService
+    public class PatientService : IPatientService
     {
         private readonly string _connectionString;
 
@@ -99,7 +100,7 @@ namespace LabCollect.Repository.Implementation
 
                             Address = reader["Address"] == DBNull.Value
                                 ? null
-                                : reader["Address"].ToString()                          
+                                : reader["Address"].ToString()
                         };
                     }
                 }
@@ -107,5 +108,48 @@ namespace LabCollect.Repository.Implementation
             return null;
         }
 
+
+        public async Task<bool> UpdatePatientAsync(Patient model)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_connectionString))
+                {
+                    using (SqlCommand cmd = new SqlCommand("dbo.UpdatePatient", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        cmd.Parameters.AddWithValue("@PatientId", model.PatientId);
+                        cmd.Parameters.AddWithValue("@PatientName", model.PatientName ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@DateOfBirth", model.DateOfBirth ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Gender", model.Gender ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@ContactNumber", model.ContactNumber ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Email", model.Email ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Address", model.Address ?? (object)DBNull.Value);
+                        // cmd.Parameters.AddWithValue("@IsDeleted", model.IsDeleted);
+
+                        await conn.OpenAsync();
+                        int rowsAffected = 0;
+                        using (var reader = await cmd.ExecuteReaderAsync())
+                        {
+                            if (await reader.ReadAsync())
+                            {
+                                rowsAffected = reader.GetInt32(0);
+                            }
+                        }
+
+                        return rowsAffected > 0;
+
+                       
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log error as needed
+                throw new Exception("Error updating patient", ex);
+            }
+
+        }
     }
 }

@@ -149,7 +149,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.OrderByDescending(e=>e.CreatedDate))
+        @foreach (var item in Model)
         {
             <tr>
                 <td>@item.SampleId</td>
@@ -177,12 +177,36 @@
                         <span class="text-muted">No Image</span>
                     }
                 </td>
-                <td>
-                    <a asp-controller="Payment" asp-action="Update" asp-route-paymentId="@item.PaymentId" title="Edit Payment"><i class="fa fa-edit"></i></a>
-                    <a asp-controller="Payment" asp-action="Create" asp-route-patientId="@item.PatientId" class="btn btn-sm btn-success" title="Add New Visit"><i class="fa fa-plus"></i></a>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light border-0" type="button" id="actionMenuButton-@item.PatientId"
+                                    data-bs-toggle="dropdown" aria-expanded="false" title="More Actions">
+                                <i class="fa fa-cog fs-5 text-secondary"></i>
+                            </button>
 
-                   
-                </td>
+                            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="actionMenuButton-@item.PatientId">
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Payment" asp-action="Update"
+                                       asp-route-paymentId="@item.PaymentId">
+                                        <i class="fa fa-edit text-warning me-2"></i> Edit Payment
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Payment" asp-action="Create"
+                                       asp-route-patientId="@item.PatientId">
+                                        <i class="fa fa-plus text-success me-2"></i> Add New Visit
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Patient" asp-action="UpdatePatient"
+                                       asp-route-patientId="@item.PatientId">
+                                        <i class="fa fa-user-edit text-primary me-2"></i> Update Patient
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+
             </tr>
         }
     </tbody>

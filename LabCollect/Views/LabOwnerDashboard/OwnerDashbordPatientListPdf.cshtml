@@ -1,0 +1,143 @@
+﻿@model List<PaymentViewModel>
+@{
+    Layout = null;
+    var totalAmount = Model?.Sum(x => x.Amount) ?? 0;
+    var totalPaid = Model?.Sum(x => x.PaidAmount) ?? 0;
+    var totalRemaining = Model?.Sum(x => x.RemaingAmount) ?? 0;
+}
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        margin: 20px;
+        color: #333;
+    }
+
+    h2 {
+        text-align: center;
+        color: #1a73e8;
+        border-bottom: 2px solid #1a73e8;
+        padding-bottom: 5px;
+    }
+
+    h4 {
+        margin-top: 25px;
+        color: #0d47a1;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 3px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 15px;
+        font-size: 11px;
+    }
+
+    th, td {
+        border: 1px solid #999;
+        padding: 6px 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f1f1f1;
+    }
+
+    .summary-boxes {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+
+    .summary-box {
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 8px 12px;
+        width: 19%;
+        text-align: center;
+        background-color: #fafafa;
+    }
+
+    .assistant-section {
+        page-break-inside: avoid;
+        margin-bottom: 30px;
+    }
+
+    .assistant-info {
+        background: #f9fbfd;
+        border: 1px solid #dce3eb;
+        border-radius: 5px;
+        padding: 8px 12px;
+        margin-bottom: 8px;
+    }
+
+    .no-data {
+        font-style: italic;
+        color: #888;
+        margin-left: 10px;
+    }
+
+    .tfoot td {
+        font-weight: bold;
+        background-color: #e8f0fe;
+    }
+
+    
+</style>
+
+<h2>Lab Owner Dashboard Report</h2>
+<p><strong>Date:</strong> @DateTime.Now.ToString("dd-MMM-yyyy")</p>
+
+<!-- Totals Section -->
+
+
+<!-- Assistant Summaries -->
+@if (Model != null && Model.Any())
+        {
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sample Id</th>
+                        <th>Patient Name</th>
+                        <th>Total Amount</th>
+                        <th>Paid</th>
+                        <th>Remaining</th>
+                        <th>Payment Method</th>
+                        <th>Status</th>
+                <th>Assitant Name</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+            @foreach (var p in Model)
+                    {
+                        <tr>
+                            <td>@p.SampleId</td>
+                            <td>@p.PatientName</td>
+                            <td>₹@p.Amount</td>
+                            <td>₹@p.PaidAmount</td>
+                            <td>₹@p.RemaingAmount</td>
+                            <td>@p.PaymentMethod</td>
+                            <td>@p.Status</td>
+                            <td>@p.AssistantName</td>
+                            <td>@p.CreatedDate.ToString("dd-MMM-yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="2" style="text-align:right">Totals:</td>
+                <td>₹@totalAmount</td>
+                <td>₹@totalPaid</td>
+                <td>₹@totalRemaining</td>
+                <td colspan="4"></td>
+            </tr>
+        </tfoot>
+            </table>
+        }
+        else
+        {
+            <p class="no-data">No patient details available for this assistant.</p>
+        }

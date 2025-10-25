@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using LabCollect.Repository.Interface;
 using System.Security.Claims;
+using LabCollect.Repository.Implementation;
 
 namespace LabCollect.Controllers
 {
@@ -18,8 +19,8 @@ namespace LabCollect.Controllers
             _patientService = patientService;
         }
 
-        [HttpGet]
-        public IActionResult Create(int patientId=0)
+        [HttpGet("Payment/Create")]
+        public async Task<IActionResult> Create(int patientId=0)
         {
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
                 return RedirectToAction("Login", "Account");
@@ -36,13 +37,13 @@ namespace LabCollect.Controllers
                 paymentPatientViewModel.DateOfBirth = patient.DateOfBirth;
                 paymentPatientViewModel.Gender = patient.Gender;
                 //paymentPatientViewModel.SampleId = patient.SampleId;
-                
+               
                 return View(paymentPatientViewModel);
             }
+
             return View();
         }
 
-        [HttpPost]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PaymentPatientViewModel model)
@@ -97,6 +98,7 @@ namespace LabCollect.Controllers
         }
 
 
+        [HttpGet("Payment/Update")]
         public IActionResult Update(int paymentId)
         {
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
@@ -141,7 +143,7 @@ namespace LabCollect.Controllers
             return RedirectToAction("Index", "Assistant"); ;
         }
 
-        [HttpGet]
+        [HttpGet("Payment/SearchPatients")]
         public JsonResult SearchPatients(string term)
         {
 

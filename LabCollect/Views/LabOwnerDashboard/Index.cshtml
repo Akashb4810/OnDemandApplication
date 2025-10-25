@@ -5,7 +5,7 @@
 }
 
 <style>
-   
+
 
     /* Card styling */
     .dashboard-card {
@@ -39,17 +39,24 @@
             background-color: #00c6ff;
             border-color: #00c6ff;
         }
+
+    .dropdown:hover .dropdown-menu {
+        display: block;
+        margin-top: 0; /* Optional: adjust spacing */
+    }
+
+
 </style>
 
 <div class="container mt-4">
 
     <!-- Filter Form -->
     <form method="get" asp-action="Index" class="row g-3 mb-4">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label class="form-label fw-bold">Start Date</label>
             <input type="date" name="startDate" value="@ViewBag.StartDate" class="form-control" />
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label class="form-label fw-bold">End Date</label>
             <input type="date" name="endDate" value="@ViewBag.EndDate" class="form-control" />
         </div>
@@ -60,6 +67,34 @@
         <div class="col-md-2 d-flex align-items-end">
             <button type="submit" class="btn btn-primary w-100">Filter</button>
         </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+            <div class="dropdown">
+                <a class="btn btn-danger dropdown-toggle" href="#" role="button" id="pdfDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-file-earmark-pdf"></i> Download PDF
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="pdfDropdown">
+                    <li>
+                        <a class="dropdown-item" asp-action="ExportToPdf"
+                           asp-route-startDate="@ViewBag.StartDate"
+                           asp-route-endDate="@ViewBag.EndDate"
+                           asp-route-paymentReceivedBy="@ViewBag.PaymentReceivedBy">
+                            Export PDF (Default)
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" asp-action="ExportToPdfAsPaymentList"
+                           asp-route-startDate="@ViewBag.StartDate"
+                           asp-route-endDate="@ViewBag.EndDate"
+                           asp-route-paymentReceivedBy="@ViewBag.PaymentReceivedBy">
+                            Export PDF as Payment List
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
     </form>
 
     <!-- Totals Section -->

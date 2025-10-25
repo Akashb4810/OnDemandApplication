@@ -7,5 +7,6 @@ namespace LabCollect.Repository.Interface
         Patient GetPatientByName(string name);
         Patient GetPatientById(int id);
         List<Patient> SearchPatientsByName(string name);
+        Task<bool> UpdatePatientAsync(Patient model);
     }
 }

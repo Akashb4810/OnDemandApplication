@@ -4,8 +4,21 @@
     Layout = "~/Views/_assistantLayoutPage.cshtml";
 }
 
-<h2>Remaining Payments</h2>
-
+<style>
+    .dashboard-header {
+        font-weight: 700;
+        font-size: 1.8rem;
+        color: #0d6efd; /* Bootstrap Primary Blue */
+        display: flex;
+        align-items: center;
+        margin-bottom: 25px;
+        letter-spacing: 0.5px;
+        text-shadow: 0 1px 2px rgba(13, 110, 253, 0.2);
+    }
+</style>
+<h2 class="dashboard-header">
+    <i class="bi bi-cash-coin me-2"></i> Remaining Payments
+</h2>
 <!-- Filters -->
 <form asp-action="RemainingPayments" method="get" class="row g-3 mb-3">
     <div class="col-md-3">
@@ -21,36 +34,39 @@
     </div>
 </form>
 
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>PaymentId</th>
-            <th>PatientId</th>
-            <th>Amount</th>
-            <th>PaidAmount</th>
-            <th>RemainingAmount</th>
-            <th>Method</th>
-            <th>Status</th>
-            <th>Created</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.PaymentId</td>
-                <td>@item.PatientId</td>
-                <td>@item.Amount</td>
-                <td>@item.PaidAmount</td>
-                <td>@item.RemaingAmount</td>
-                <td>@item.PaymentMethod</td>
-                <td>@item.Status</td>
-                <td>@item.CreatedDate.ToString("dd-MM-yyyy")</td>
-            </tr>
-        }
-    </tbody>
-</table>
-
+<div class="card shadow-sm">
+    <div class="table-responsive shadow-sm rounded-4 bg-white p-3">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>PaymentId</th>
+                    <th>PatientId</th>
+                    <th>Amount</th>
+                    <th>PaidAmount</th>
+                    <th>RemainingAmount</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.PaymentId</td>
+                        <td>@item.PatientId</td>
+                        <td>@item.Amount</td>
+                        <td>@item.PaidAmount</td>
+                        <td>@item.RemaingAmount</td>
+                        <td>@item.PaymentMethod</td>
+                        <td>@item.Status</td>
+                        <td>@item.CreatedDate.ToString("dd-MM-yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 <!-- Pagination controls -->
 <div class="d-flex justify-content-end align-items-center gap-3 mt-3">
     <!-- Items per page -->

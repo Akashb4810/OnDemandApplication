@@ -1,18 +1,28 @@
-﻿using System.Security.Claims;
+﻿using System.Drawing.Printing;
+using System.Security.Claims;
 using LabCollect.Models;
 using LabCollect.Repository.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using System.IO;
+using LabCollect.Repository.Implementation;
+using Rotativa;
+using Rotativa.AspNetCore;
+
 
 namespace LabCollect.Controllers
 {
     public class LabOwnerDashboardController : Controller
     {
-        
+
         private readonly IOwnerDashboardService _ownerDashboardService;
-        public LabOwnerDashboardController(IOwnerDashboardService ownerDashboardService)
+        private readonly IPaymentService _paymentService;
+        public LabOwnerDashboardController(IOwnerDashboardService ownerDashboardService, IPaymentService paymentService)
         {
             _ownerDashboardService = ownerDashboardService;
+            _paymentService = paymentService;
         }
 
         public IActionResult Index(DateTime? startDate, DateTime? endDate, string paymentReceivedBy)
@@ -96,7 +106,7 @@ namespace LabCollect.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-           
+
             if (_ownerDashboardService.CreateUser(model, out int newUserId))
             {
                 TempData["Success"] = $"User created successfully with ID {newUserId}";
@@ -125,6 +135,62 @@ namespace LabCollect.Controllers
         new SelectListItem { Value = "1", Text = "Lab" },
         new SelectListItem { Value = "2", Text = "Dairy" }
     };
+        }
+
+
+
+        public IActionResult ExportToPdf(DateTime? startDate, DateTime? endDate, string? paymentReceivedBy)
+        {
+            // 1. Get main dashboard data
+            var model = _ownerDashboardService.GetOwnerDashboardSummary(startDate, endDate, paymentReceivedBy);
+
+            var paymentsDetails= _paymentService.GetPaymentsByAssistant(0);
+            // 2. Add patient-level details for each assistant
+            foreach (var assistant in model.AssistantSummaries)
+            {
+                var payments = paymentsDetails.Where(e => e.AssistantId == assistant.AssistantId);
+
+                if (startDate.HasValue)
+                    payments = payments.Where(p => p.CreatedDate.Date >= startDate.Value.Date).ToList();
+                if (endDate.HasValue)
+                    payments = payments.Where(p => p.CreatedDate.Date <= endDate.Value.Date).ToList();
+
+                assistant.PatientPayments = payments.ToList(); // add new property for PDF rendering
+            }
+
+            // 3. Render PDF
+            return new ViewAsPdf("OwnerDashboardPdf", model)
+            {
+                FileName = "LabOwnerDashboard.pdf",
+                PageSize = Rotativa.AspNetCore.Options.Size.A4,
+                PageOrientation = Rotativa.AspNetCore.Options.Orientation.Landscape,
+                PageMargins = new Rotativa.AspNetCore.Options.Margins(10, 10, 10, 10)
+            };
+
+        }
+
+        public IActionResult ExportToPdfAsPaymentList(DateTime? startDate, DateTime? endDate, string? paymentReceivedBy)
+        {
+            // 1. Get main dashboard data
+           // var model = _ownerDashboardService.GetOwnerDashboardSummary(startDate, endDate, paymentReceivedBy);
+
+            var paymentsDetails = _paymentService.GetPaymentsByAssistant(0).OrderByDescending(e => e.SampleId).ToList();
+
+                if (startDate.HasValue)
+                paymentsDetails = paymentsDetails.Where(p => p.CreatedDate.Date >= startDate.Value.Date).ToList();
+                if (endDate.HasValue)
+                paymentsDetails = paymentsDetails.Where(p => p.CreatedDate.Date <= endDate.Value.Date).ToList();
+
+
+            // 3. Render PDF
+            return new ViewAsPdf("OwnerDashbordPatientListPdf", paymentsDetails)
+            {
+                FileName = "LabOwnerDashboardPatientList.pdf",
+                PageSize = Rotativa.AspNetCore.Options.Size.A4,
+                PageOrientation = Rotativa.AspNetCore.Options.Orientation.Landscape,
+                PageMargins = new Rotativa.AspNetCore.Options.Margins(10, 10, 10, 10)
+            };
+
         }
 
     }

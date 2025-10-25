@@ -91,7 +91,7 @@ namespace LabCollect.Repository.Implementation
                     Amount = reader["Amount"] != DBNull.Value ? Convert.ToDecimal(reader["Amount"]) : 0m,
                     PaymentMethod = reader["PaymentMethod"] != DBNull.Value ? reader["PaymentMethod"].ToString() : string.Empty,
                     Status = reader["Status"] != DBNull.Value ? reader["Status"].ToString() : string.Empty,
-                    AssistantId = assistantId,
+                    AssistantId = reader["AssistantId"] != DBNull.Value ? Convert.ToInt32(reader["AssistantId"]) : 0,
                     PaidAmount = reader["PaidAmount"] != DBNull.Value ? Convert.ToDecimal(reader["PaidAmount"]) : 0m,
                     RemaingAmount = reader["RemainingAmount"] != DBNull.Value ? Convert.ToDecimal(reader["RemainingAmount"]) : 0m,
                     AssistantName = reader["AssistantName"] != DBNull.Value ? reader["AssistantName"].ToString() : string.Empty,

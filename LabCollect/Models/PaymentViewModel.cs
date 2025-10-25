@@ -26,6 +26,8 @@ namespace LabCollect.Models
         public string? AssistantName { get; set; }
         public string? PrescriptionImgURL { get; set; }
         public int Visit { get; set; }
+        
+
     }
 
 
@@ -79,12 +81,12 @@ namespace LabCollect.Models
     public class Patient
     {
         public int PatientId { get; set; }           // Primary Key
-        public int SampleId { get; set; }           // Primary Key
+        public int? SampleId { get; set; }           // Primary Key
         public string PatientName { get; set; }      // Patient full name
         public DateTime? DateOfBirth { get; set; }   // Optional
         public string Gender { get; set; }           // Optional (Male/Female/Other)
         public string ContactNumber { get; set; }    // Optional
-        public string Email { get; set; }            // Optional
+        public string? Email { get; set; }            // Optional
         public string Address { get; set; }          // Optional
 
         // Optional helper properties if needed

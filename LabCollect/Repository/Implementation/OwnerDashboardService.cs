@@ -37,6 +37,7 @@ namespace LabCollect.Repository.Implementation
                             AssistantName = reader.GetString(reader.GetOrdinal("AssistantName")),
                             PatientCount = reader.IsDBNull(reader.GetOrdinal("PatientCount")) ? 0 : reader.GetInt32(reader.GetOrdinal("PatientCount")),
                             TotalPaymentCollected = reader.IsDBNull(reader.GetOrdinal("TotalPaymentCollected")) ? 0 : reader.GetDecimal(reader.GetOrdinal("TotalPaymentCollected")),
+                            TotalBillPayment = reader.IsDBNull(reader.GetOrdinal("TotalBillPayment")) ? 0 : reader.GetDecimal(reader.GetOrdinal("TotalBillPayment")),
                             TotalRemainingAmount = reader.IsDBNull(reader.GetOrdinal("TotalRemainingAmount")) ? 0 : reader.GetDecimal(reader.GetOrdinal("TotalRemainingAmount")),
                             TotalReceivedByOwner = reader.IsDBNull(reader.GetOrdinal("TotalReceivedByOwner")) ? 0 : reader.GetDecimal(reader.GetOrdinal("TotalReceivedByOwner")),
                             TotalUnpaidToOwner = reader.IsDBNull(reader.GetOrdinal("TotalUnpaidToOwner")) ? 0 : reader.GetDecimal(reader.GetOrdinal("TotalUnpaidToOwner"))
@@ -49,6 +50,7 @@ namespace LabCollect.Repository.Implementation
             return new OwnerDashboardViewModel
             {
                 AssistantSummaries = summaries,
+                TotalBillPayment = summaries.Sum(x => x.TotalBillPayment),
                 TotalPayment = summaries.Sum(x => x.TotalPaymentCollected),
                 TotalRemaining = summaries.Sum(x => x.TotalRemainingAmount),
                 TotalPatients = summaries.Sum(x => x.PatientCount),

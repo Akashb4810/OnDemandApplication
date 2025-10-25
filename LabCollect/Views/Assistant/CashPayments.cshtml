@@ -5,8 +5,22 @@
     Layout = "~/Views/_assistantLayoutPage.cshtml";
 }
 
-<h1>Cash Payments</h1>
 
+<style>
+    .dashboard-header {
+        font-weight: 700;
+        font-size: 1.8rem;
+        color: #0d6efd; /* Bootstrap Primary Blue */
+        display: flex;
+        align-items: center;
+        margin-bottom: 25px;
+        letter-spacing: 0.5px;
+        text-shadow: 0 1px 2px rgba(13, 110, 253, 0.2);
+    }
+</style>
+<h2 class="dashboard-header">
+    <i class="bi bi-cash-coin me-2"></i> Cash Payments
+</h2>
 <!-- Filters -->
 <form asp-action="CashPayments" method="get" class="row g-3 mb-3">
     <div class="col-md-3">
@@ -22,8 +36,9 @@
     </div>
 </form>
 
-<table class="table table-bordered table-striped">
-    <thead>
+<div class="table-responsive shadow-sm rounded-4 bg-white p-3">
+    <table class="table table-hover mb-0">
+        <thead class="table-light">
         <tr>
             <th>PaymentId</th>
             <th>PatientId</th>
@@ -51,7 +66,7 @@
         }
     </tbody>
 </table>
-
+</div>
 <!-- Pagination controls -->
 <div class="d-flex justify-content-end align-items-center gap-3 mt-3">
     <!-- Items per page -->

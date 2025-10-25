@@ -1,0 +1,158 @@
+﻿@model OwnerDashboardViewModel
+@{
+    Layout = null;
+}
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        margin: 20px;
+        color: #333;
+    }
+
+    h2 {
+        text-align: center;
+        color: #1a73e8;
+        border-bottom: 2px solid #1a73e8;
+        padding-bottom: 5px;
+    }
+
+    h4 {
+        margin-top: 25px;
+        color: #0d47a1;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 3px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 15px;
+        font-size: 11px;
+    }
+
+    th, td {
+        border: 1px solid #999;
+        padding: 6px 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f1f1f1;
+    }
+
+    .summary-boxes {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+
+    .summary-box {
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 8px 12px;
+        width: 19%;
+        text-align: center;
+        background-color: #fafafa;
+    }
+
+    .assistant-section {
+        page-break-inside: avoid;
+        margin-bottom: 30px;
+    }
+
+    .assistant-info {
+        background: #f9fbfd;
+        border: 1px solid #dce3eb;
+        border-radius: 5px;
+        padding: 8px 12px;
+        margin-bottom: 8px;
+    }
+
+    .no-data {
+        font-style: italic;
+        color: #888;
+        margin-left: 10px;
+    }
+</style>
+
+<h2>Lab Owner Dashboard Report</h2>
+<p><strong>Date:</strong> @DateTime.Now.ToString("dd-MMM-yyyy")</p>
+
+<!-- Totals Section -->
+<div class="summary-boxes">
+    <div class="summary-box">
+        <strong>Total Patients</strong><br />
+        @Model.TotalPatients
+    </div>
+    <div class="summary-box">
+        <strong>Total Payment</strong><br />
+        ₹@Model.TotalPayment
+    </div>
+    <div class="summary-box">
+        <strong>Total Remaining</strong><br />
+        ₹@Model.TotalRemaining
+    </div>
+    <div class="summary-box">
+        <strong>Received by Owner</strong><br />
+        ₹@Model.TotalReceivedByOwner
+    </div>
+    <div class="summary-box">
+        <strong>Unpaid to Owner</strong><br />
+        ₹@Model.TotalUnpaidToOwner
+    </div>
+</div>
+
+<!-- Assistant Summaries -->
+@foreach (var assistant in Model.AssistantSummaries)
+{
+    <div class="assistant-section">
+        <h4>@assistant.AssistantName</h4>
+        <div class="assistant-info">
+            <strong>Patients:</strong> @assistant.PatientCount |
+            <strong>Total Collection:</strong> @assistant.TotalBillPayment |
+            <strong>Total Collected Assistants:</strong> ₹@assistant.TotalPaymentCollected |
+            <strong>Remaining:</strong> ₹@assistant.TotalRemainingAmount |
+            <strong>Paid by Owner:</strong> ₹@assistant.TotalReceivedByOwner |
+            <strong>Unpaid to Owner:</strong> ₹@assistant.TotalUnpaidToOwner
+        </div>
+
+        @if (assistant.PatientPayments != null && assistant.PatientPayments.Any())
+        {
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sample Id</th>
+                        <th>Patient Name</th>
+                        <th>Total Amount</th>
+                        <th>Paid</th>
+                        <th>Remaining</th>
+                        <th>Payment Method</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in assistant.PatientPayments)
+                    {
+                        <tr>
+                            <td>@p.SampleId</td>
+                            <td>@p.PatientName</td>
+                            <td>₹@p.Amount</td>
+                            <td>₹@p.PaidAmount</td>
+                            <td>₹@p.RemaingAmount</td>
+                            <td>@p.PaymentMethod</td>
+                            <td>@p.Status</td>
+                            <td>@p.CreatedDate.ToString("dd-MMM-yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="no-data">No patient details available for this assistant.</p>
+        }
+    </div>
+}
