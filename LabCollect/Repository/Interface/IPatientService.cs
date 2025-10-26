@@ -5,7 +5,7 @@ namespace LabCollect.Repository.Interface
     public interface IPatientService
     {
         Patient GetPatientByName(string name);
-        Patient GetPatientById(int id);
+        Task<Patient> GetPatientById(int id);
         List<Patient> SearchPatientsByName(string name);
         Task<bool> UpdatePatientAsync(Patient model);
     }

@@ -64,16 +64,16 @@ namespace LabCollect.Repository.Implementation
             return null;
         }
 
-        public Patient GetPatientById(int id)
+        public async Task<Patient> GetPatientById(int id)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             using (SqlCommand cmd = new SqlCommand("SELECT TOP 1 * FROM Patients WHERE PatientId=@Id", conn))
             {
                 cmd.Parameters.AddWithValue("@Id", id);
                 conn.Open();
-                using (var reader = cmd.ExecuteReader())
+                using (var reader =await cmd.ExecuteReaderAsync())
                 {
-                    if (reader.Read())
+                    if (await reader.ReadAsync())
                     {
                         return new Patient
                         {

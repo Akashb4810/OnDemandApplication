@@ -21,7 +21,7 @@ namespace LabCollect.Controllers
         public async Task<IActionResult> UpdatePatient(int patientId)
         {
             Patient patient = new Patient();
-            patient=_patientService.GetPatientById(patientId);
+            patient=await _patientService.GetPatientById(patientId);
             return View(patient);
         }
         [HttpPost]

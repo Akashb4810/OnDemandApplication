@@ -37,6 +37,10 @@ namespace LabCollect.Controllers
                 endDate = DateTime.Now;
 
             var viewModel =await _ownerDashboardService.GetOwnerDashboardSummary(startDate, endDate, paymentReceivedBy);
+            if(paymentReceivedBy!=null)
+            {
+                viewModel.AssistantSummaries = viewModel.AssistantSummaries.Where(e => e.AssistantName != null && e.AssistantName.Contains(paymentReceivedBy, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
             ViewBag.StartDate = viewModel.StartDate.ToString("yyyy-MM-dd");
             ViewBag.EndDate = viewModel.EndDate.ToString("yyyy-MM-dd");
             ViewBag.PaymentReceivedBy = paymentReceivedBy;
@@ -44,7 +48,7 @@ namespace LabCollect.Controllers
         }
 
         [Route("Transactions")]
-        public async Task<IActionResult> Transactions(int assistantId, DateTime? startDate, DateTime? endDate, string paymentReceivedBy, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> Transactions(int assistantId, DateTime? startDate, DateTime? endDate, string paymentReceivedBy,string paymentReceivedByName, int page = 1, int pageSize = 10)
         {
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
                 return RedirectToAction("Login", "Account");
@@ -65,6 +69,7 @@ namespace LabCollect.Controllers
             ViewBag.StartDate = startDate.Value.ToString("yyyy-MM-dd");
             ViewBag.EndDate = endDate.Value.ToString("yyyy-MM-dd");
             ViewBag.PaymentReceivedBy = paymentReceivedBy;
+            ViewBag.PaymentReceivedByName = paymentReceivedByName;
             ViewBag.TotalPages = totalPages;
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;

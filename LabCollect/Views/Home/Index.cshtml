@@ -4,12 +4,12 @@
 }
 
 <!-- HERO SECTION -->
-<section class="py-5 text-center text-white position-relative"
-         style="background: url('/images/stetusScop.jpg') center/cover no-repeat; min-height: 80vh;">
-    <div class="overlay position-absolute top-0 start-0 w-100 h-100"
-         style="background: rgba(0,0,0,0.6);"></div>
-    <div class="container position-relative z-1 d-flex flex-column align-items-center justify-content-center h-100">
-        <h1 class="display-4 fw-bold mb-3 animate__animated animate__fadeInDown">🔬 Laboratory Inventory System</h1>
+<section class="text-center text-white position-relative"
+         style="background: url('/images/hero-section.jpg') center center / cover no-repeat; width: 100%; height: 100vh; margin: 0; padding: 0;">
+    <div class="container-fluid position-relative z-1 d-flex flex-column align-items-center justify-content-center h-100">
+        <h1 class="display-4 fw-bold mb-3 animate__animated animate__fadeInDown">
+            🔬 Laboratory Inventory System
+        </h1>
         <p class="lead mb-4 animate__animated animate__fadeInUp">
             Manage Patients • Inventory • Reports — All in one secure platform.
         </p>
@@ -17,7 +17,7 @@
 </section>
 
 <!-- FEATURES SECTION -->
-<section id="features" class="py-5">
+@* <section id="features" class="py-5">
     <div class="container">
         <div class="row text-center mb-5">
             <h2 class="fw-bold">⚡ Key Features</h2>
@@ -56,19 +56,158 @@
             </div>
         </div>
     </div>
+</section> *@
+
+<!-- Bootstrap Icons -->
+
+<section id="features" class="py-5 bg-light">
+    <div class="container">
+        <!-- Section Header -->
+        <div class="text-center mb-5">
+            <h2 class="fw-bold display-6 text-primary mb-2">⚡ Key Features</h2>
+            <p class="text-muted fs-5">Smart tools designed for modern laboratories & diagnostics</p>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="row g-4">
+            <!-- Feature 1 -->
+            <div class="col-md-4">
+                <div class="card feature-card border-0 shadow-sm h-100 text-center p-4">
+                    <div class="icon-wrapper bg-primary bg-opacity-10 text-primary mx-auto mb-3">
+                        <i class="bi bi-box-seam fs-1"></i>
+                    </div>
+                    <h5 class="card-title fw-semibold text-dark">Inventory Management</h5>
+                    <p class="card-text text-muted small mb-3">
+                        Track chemicals, medicines, and equipment stock in real-time with automated alerts.
+                    </p>
+                    <a href="#" class="btn btn-outline-primary btn-sm rounded-pill px-3">Manage Inventory</a>
+                </div>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="col-md-4">
+                <div class="card feature-card border-0 shadow-sm h-100 text-center p-4">
+                    <div class="icon-wrapper bg-success bg-opacity-10 text-success mx-auto mb-3">
+                        <i class="bi bi-cash-coin fs-1"></i>
+                    </div>
+                    <h5 class="card-title fw-semibold text-dark">Payments & Billing</h5>
+                    <p class="card-text text-muted small mb-3">
+                        Generate invoices, manage transactions, and simplify billing processes effortlessly.
+                    </p>
+                    <a href="#" class="btn btn-outline-success btn-sm rounded-pill px-3">View Payments</a>
+                </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="col-md-4">
+                <div class="card feature-card border-0 shadow-sm h-100 text-center p-4">
+                    <div class="icon-wrapper bg-warning bg-opacity-10 text-warning mx-auto mb-3">
+                        <i class="bi bi-graph-up-arrow fs-1"></i>
+                    </div>
+                    <h5 class="card-title fw-semibold text-dark">Reports & Analytics</h5>
+                    <p class="card-text text-muted small mb-3">
+                        Analyze test data, track trends, and visualize performance with interactive reports.
+                    </p>
+                    <a href="#" class="btn btn-outline-warning btn-sm rounded-pill px-3 text-dark">View Reports</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
+<!-- Custom CSS -->
+<style>
+    #features {
+        background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+    }
+
+    .feature-card {
+        transition: all 0.4s ease;
+        border-radius: 15px;
+    }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+        }
+
+    .icon-wrapper {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+
+    .feature-card:hover .icon-wrapper {
+        transform: scale(1.1);
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+    }
+</style>
+
 <!-- ABOUT SECTION -->
-<section class="bg-primary text-white py-5">
+<section class="about-section py-5 bg-light position-relative">
+    <div class="container text-center" style="padding: 3rem 0px;">
+        <div class="mb-4">
+            <img src="/images/lab.jpg" class="rounded-circle shadow-lg border border-3 border-white" width="150" height="150" alt="Lab System">
+        </div>
+        <h2 class="fw-bold text-primary mb-3">Why Choose Our System?</h2>
+        <p class="text-muted mb-4 fs-5">
+            Experience a secure, efficient, and user-friendly platform built exclusively for laboratories.
+            Simplify your workflow — from patient management to payments — with powerful automation tools.
+        </p>
+
+        <div class="row justify-content-center gy-4">
+            <div class="col-md-3 col-sm-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <i class="bi bi-shield-lock-fill text-primary fs-1 mb-3"></i>
+                        <h5 class="fw-semibold">Secure & Reliable</h5>
+                        <p class="text-muted small">Your data is encrypted and always protected with top-grade security standards.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <i class="bi bi-speedometer2 text-success fs-1 mb-3"></i>
+                        <h5 class="fw-semibold">Fast Performance</h5>
+                        <p class="text-muted small">Lightning-fast operations ensure smooth data handling and reports.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <i class="bi bi-gear-wide-connected text-info fs-1 mb-3"></i>
+                        <h5 class="fw-semibold">Easy Management</h5>
+                        <p class="text-muted small">Manage patients, payments, and inventory — all from a single dashboard.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ABOUT SECTION -->
+@* <section class="bg-primary text-white py-5">
     <div class="container text-center">
         <img src="/images/lab.jpg" class="rounded-circle mb-4 shadow" width="120" alt="Team">
         <h2 class="fw-bold mb-3">🚀 Why Choose Our System?</h2>
         <p class="mb-4">
             Secure, fast, and tailored for laboratories to manage patients, payments, and inventory effortlessly.
         </p>
-        @* <a href="@Url.Action("Dashboard","Home")" class="btn btn-light btn-lg shadow">Start Now</a> *@
+         <a href="@Url.Action("Dashboard","Home")" class="btn btn-light btn-lg shadow">Start Now</a> 
     </div>
-</section>
+</section> *@
 
 <!-- CONTACT SECTION -->
 @* <section class="py-5 bg-light">
@@ -89,7 +228,7 @@
                     <div class="mb-3">
                         <textarea class="form-control" rows="4" placeholder="Your Message"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100 shadow-sm">Send Message</button>
+                    <button type="submit" class="btn btn-primary w-100 shadow-sm">Send M`i7essage</button>
                 </form>
             </div>
         </div>

@@ -20,7 +20,8 @@
         </div>
         <div class="col-md-3">
             <label class="form-label">Received By</label>
-            <input type="text" name="paymentReceivedBy" class="form-control" value="@ViewBag.PaymentReceivedBy" placeholder="Assistant/Owner Name" />
+            <input type="text" name="paymentReceivedByName" class="form-control" value="@ViewBag.PaymentReceivedByName" placeholder="Assistant/Owner Name" />
+            <input type="hidden" name="paymentReceivedBy" value="@ViewBag.PaymentReceivedBy" />
         </div>
         <div class="col-md-2 align-self-end">
             <button type="submit" class="btn btn-primary w-100">Filter</button>

@@ -27,7 +27,7 @@ namespace LabCollect.Controllers
 
             if (patientId>0 )
             {
-                var patient = _patientService.GetPatientById(patientId);
+                var patient =await _patientService.GetPatientById(patientId);
                 PaymentPatientViewModel paymentPatientViewModel= new PaymentPatientViewModel();
                 paymentPatientViewModel.PatientId = patient.PatientId;
                 paymentPatientViewModel.PatientName = patient.PatientName;
