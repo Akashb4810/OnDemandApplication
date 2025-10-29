@@ -224,5 +224,37 @@
             btnText.textContent = "Saving...";
             btnLoader.classList.remove("d-none");
         });
+
+        // ✅ Prevent SampleId = 0
+        const sampleIdInput = document.getElementById("SampleId");
+        sampleIdInput.addEventListener("input", function () {
+            const value = parseInt(sampleIdInput.value) || 0;
+            if (value === 0) {
+                alert("❌ Sample ID cannot be 0. Please enter a valid ID.");
+                sampleIdInput.value = "";
+            }
+        });
+
+             // ✅ Auto-set status to "Paid" if PaidAmount == Amount
+        const paidAmountInput = document.querySelector("input[name='PaidAmount']");
+        const amountInput = document.getElementById("Amount");
+        const statusSelect = document.querySelector("select[name='Status']");
+
+        function updatePaymentStatus() {
+            const amount = parseFloat(amountInput.value) || 0;
+            const paid = parseFloat(paidAmountInput.value) || 0;
+
+            if (paid === amount && amount > 0) {
+                statusSelect.value = "Paid";
+            } else if (paid < amount && paid > 0) {
+                statusSelect.value = "Unpaid";
+            } else {
+                statusSelect.value = "";
+            }
+        }
+
+        paidAmountInput.addEventListener("input", updatePaymentStatus);
+        amountInput.addEventListener("input", updatePaymentStatus);
+
     </script>
 }

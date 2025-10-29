@@ -199,5 +199,29 @@ namespace LabCollect.Controllers
 
         }
 
+        public async Task<IActionResult> ExportToPdfAsUnpaidPatientPaymentList(DateTime? startDate, DateTime? endDate, string? paymentReceivedBy)
+        {
+            // 1. Get main dashboard data
+            // var model = _ownerDashboardService.GetOwnerDashboardSummary(startDate, endDate, paymentReceivedBy);
+
+            var paymentsDetails = await _paymentService.GetPaymentsByAssistant(0);
+            paymentsDetails= paymentsDetails.Where(e=>e.Status.Equals("Unpaid", StringComparison.OrdinalIgnoreCase)).OrderByDescending(e => e.CreatedDate).ToList();
+            //if (startDate.HasValue)
+            //    paymentsDetails = paymentsDetails.Where(p => p.CreatedDate.Date >= startDate.Value.Date).ToList();
+            //if (endDate.HasValue)
+            //    paymentsDetails = paymentsDetails.Where(p => p.CreatedDate.Date <= endDate.Value.Date).ToList();
+
+
+            // 3. Render PDF
+            return new ViewAsPdf("OwnerDashbordPatientListPdf", paymentsDetails)
+            {
+                FileName = "UnpaidPatientList.pdf",
+                PageSize = Rotativa.AspNetCore.Options.Size.A4,
+                PageOrientation = Rotativa.AspNetCore.Options.Orientation.Landscape,
+                PageMargins = new Rotativa.AspNetCore.Options.Margins(10, 10, 10, 10)
+            };
+
+        }
+
     }
 }

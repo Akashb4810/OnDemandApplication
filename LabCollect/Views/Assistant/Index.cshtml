@@ -143,6 +143,7 @@
             <th>Paid</th>
             <th>Remaining</th>
             <th>Payment Method</th>
+            <th>TransactionDate</th>
             <th>Status</th>
             <th>Prescription Image</th>
             <th>Actions</th>
@@ -161,6 +162,7 @@
                 <td>@item.PaidAmount</td>
                 <td>@item.RemaingAmount</td>
                 <td>@item.PaymentMethod</td>
+                <td>@item.CreatedDate</td>
                 <td>@item.Status</td>
                 <td>
                     @if (!string.IsNullOrEmpty(item.PrescriptionImgURL))

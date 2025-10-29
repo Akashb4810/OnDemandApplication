@@ -59,5 +59,36 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const paidAmountInput = document.querySelector("#PaidAmount");
+            const remainingAmount = parseFloat("@Model.RemaingAmount") || 0;
+
+            paidAmountInput.addEventListener("input", function () {
+                const paidAmount = parseFloat(paidAmountInput.value) || 0;
+
+                if (paidAmount > remainingAmount) {
+                    // Show a Bootstrap alert message (you can also use alert())
+                    const alertDiv = document.createElement("div");
+                    alertDiv.className = "alert alert-danger mt-2";
+                    alertDiv.innerText = "❌ Paid amount cannot be greater than remaining amount.";
+
+                    // Remove any existing alert first
+                    const existingAlert = document.querySelector(".alert-danger");
+                    if (existingAlert) existingAlert.remove();
+
+                    // Insert alert after the PaidAmount input
+                    paidAmountInput.parentNode.appendChild(alertDiv);
+
+                    // Optionally clear the invalid value
+                    paidAmountInput.value = "";
+                } else {
+                    // Remove the alert if user corrects the value
+                    const existingAlert = document.querySelector(".alert-danger");
+                    if (existingAlert) existingAlert.remove();
+                }
+            });
+        });
+    </script>
 }
 

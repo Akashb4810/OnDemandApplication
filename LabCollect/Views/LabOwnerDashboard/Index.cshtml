@@ -90,6 +90,14 @@
                             Export PDF as Payment List
                         </a>
                     </li>
+                    <li>
+                        <a class="dropdown-item" asp-action="ExportToPdfAsUnpaidPatientPaymentList"
+                           asp-route-startDate="@ViewBag.StartDate"
+                           asp-route-endDate="@ViewBag.EndDate"
+                           asp-route-paymentReceivedBy="@ViewBag.PaymentReceivedBy">
+                            Export PDF Unpaid Patient
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
