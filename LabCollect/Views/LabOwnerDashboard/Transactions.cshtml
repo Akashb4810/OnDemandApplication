@@ -5,16 +5,46 @@
 }
 
 <div class="container mt-4">
-    <h2 class="mb-3">Assistant Transactions</h2>
+    <div class="row align-items-center mb-3">
+        <div class="col">
+            <h2 class="mb-0">Assistant Transactions</h2>
+        </div>
+        <div class="col-auto">
+            <a asp-action="Index" class="btn btn-secondary">
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
 
-    <!-- Filters -->
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success">@TempData["Message"]</div>
+    }
+    @{
+        // 💰 General Totals
+        decimal totalCashPaid = Model.Where(t => t.PaymentMethod == "Cash").Sum(t => t.PaidAmount);
+        decimal totalOnlinePaid = Model.Where(t => t.PaymentMethod == "Online").Sum(t => t.PaidAmount);
+        decimal totalPaid = totalCashPaid + totalOnlinePaid;
+        decimal totalRemaining = Model.Sum(t => t.RemainingAmount);
+        decimal grandTotal = Model.Sum(t => t.TotalAmount);
+
+        // 👑 Totals Received by Owner
+        decimal totalCashPaidToOwner = Model
+        .Where(t => t.PaymentMethod == "Cash" && t.IsReceivedByOwner)
+        .Sum(t => t.PaidAmount);
+
+        decimal totalOnlinePaidToOwner = Model
+        .Where(t => t.PaymentMethod == "Online" && t.IsReceivedByOwner)
+        .Sum(t => t.PaidAmount);
+    }
+
     <form asp-action="Transactions" method="get" class="row g-3 mb-3">
         <input type="hidden" name="assistantId" value="@ViewBag.AssistantId" />
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label class="form-label">Start Date</label>
             <input type="date" name="startDate" class="form-control" value="@ViewBag.StartDate" />
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label class="form-label">End Date</label>
             <input type="date" name="endDate" class="form-control" value="@ViewBag.EndDate" />
         </div>
@@ -23,73 +53,200 @@
             <input type="text" name="paymentReceivedByName" class="form-control" value="@ViewBag.PaymentReceivedByName" placeholder="Assistant/Owner Name" />
             <input type="hidden" name="paymentReceivedBy" value="@ViewBag.PaymentReceivedBy" />
         </div>
-        <div class="col-md-2 align-self-end">
-            <button type="submit" class="btn btn-primary w-100">Filter</button>
+        <div class="col-md-2">
+            <label class="form-label">Payment Method</label>
+            <select name="paymentMethod" class="form-select">
+                <option value="">All</option>
+                <option value="Cash" selected="@(ViewBag.PaymentMethod == "Cash")">Cash</option>
+                <option value="Online" selected="@(ViewBag.PaymentMethod == "Online")">Online</option>
+            </select>
+
         </div>
+        <div class="col-md-3 align-self-end d-flex gap-2">
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+
+            <a asp-action="AssistantExportToPdf"
+               asp-controller="LabOwnerDashboard"
+               asp-route-startDate="@ViewBag.StartDate"
+               asp-route-endDate="@ViewBag.EndDate"
+               asp-route-paymentReceivedBy="@ViewBag.PaymentReceivedBy"
+               target="_blank"
+               class="btn btn-outline-danger w-100">
+                <i class="bi bi-file-earmark-pdf"></i> PDF
+            </a>
+        </div>
+
     </form>
-    <div class="table-responsive" style="overflow-x: auto;">
-        <table class="table table-bordered table-hover">
-            <thead class="table-light">
-                <tr>
-                    <th>Date</th>
-                    <th>Patient</th>
-                    <th>Patient Name</th>
-                    <th>Payment ID</th>
-                    <th>Method</th>
-                    <th>Note</th>
-                    <th>TotalAmount</th>
-                    <th>Bill Amount(AD)</th>
-                    <th>DiscountAmount</th>
-                    <th>Paid Amount</th>
-                    <th>Remaining</th>
-                    <th>Received By</th>
-                    <th>Owner Received?</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var t in Model)
-                {
-                    <tr>
-                        <td>@t.TransactionDate.ToString("dd-MMM-yyyy HH:mm")</td>
-                        <td>@t.PatientId</td>
-                        <td>@t.PatientName</td>
-                        <td>@t.PaymentId</td>
-                        <td>@t.PaymentMethod</td>
-                        <td>@t.Notes</td>
-                        <td>@t.TotalAmount</td>
-                        <td>₹@t.BillAmount</td>
-                        <td>@t.DiscountAmount</td>
-                        <td>₹@t.PaidAmount</td>
-                        <td>₹@t.RemainingAmount</td>
-                        <td>@t.PaymentRecivedBy</td>
-                        <td>
-                            @if (t.IsReceivedByOwner)
-                            {
-                                <span class="badge bg-success">Yes</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-warning">No</span>
-                            }
-                        </td>
-                        <td>
-                            @if (!t.IsReceivedByOwner)
-                            {
-                                <form asp-action="MarkReceivedByOwner"
-                                      asp-controller="LabOwnerDashboard"
-                                      method="post">
-                                    <input type="hidden" name="transactionId" value="@t.TransactionId" />
-                                    <input type="hidden" name="assistantId" value="@ViewBag.AssistantId" />
-                                    <button type="submit" class="btn btn-sm btn-primary">Mark Received</button>
-                                </form>
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-bg-light shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-1">Total Cash Paid</h6>
+                    <h5 class="fw-bold text-success">₹@string.Format("{0:N2}", totalCashPaid)</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-light shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-1">Total Online Paid</h6>
+                    <h5 class="fw-bold text-primary">₹@string.Format("{0:N2}", totalOnlinePaid)</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-light shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-1">Total Paid (Cash + Online)</h6>
+                    <h5 class="fw-bold text-info">₹@string.Format("{0:N2}", totalPaid)</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-light shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-1">Total Remaining Payment</h6>
+                    <h5 class="fw-bold text-danger">₹@string.Format("{0:N2}", totalRemaining)</h5>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Optional: Grand Total Section -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-bg-light shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-1">Cash Paid to Owner</h6>
+                    <h5 class="fw-bold text-success">₹@string.Format("{0:N2}", totalCashPaidToOwner)</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-light shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-1">Online Paid to Owner</h6>
+                    <h5 class="fw-bold text-primary">₹@string.Format("{0:N2}", totalOnlinePaidToOwner)</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-light shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-1">Total Paid to Owner</h6>
+                    <h5 class="fw-bold text-info">
+                        ₹@string.Format("{0:N2}", (totalCashPaidToOwner + totalOnlinePaidToOwner))
+                    </h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-light shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-1">Grand Total (All Amounts)</h6>
+                    <h5 class="fw-bold text-dark">₹@string.Format("{0:N2}", grandTotal)</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+   
+    <form asp-action="AssistantMarkMultipleReceivedByOwner" asp-controller="LabOwnerDashboard" method="post">
+        <input type="hidden" name="assistantId" value="@ViewBag.AssistantId" />
+        <input type="hidden" name="startDate" value="@ViewBag.StartDate" />
+        <input type="hidden" name="endDate" value="@ViewBag.EndDate" />
+        <input type="hidden" name="paymentReceivedBy" value="@ViewBag.PaymentReceivedBy" />
+        <input type="hidden" name="paymentReceivedByName" value="@ViewBag.PaymentReceivedByName" />
+        <input type="hidden" name="paymentMethod" value="@ViewBag.PaymentMethod" />
+
+        <div class="table-responsive" style="overflow-x: auto;">
+            <div class="row mb-4">
+                <div class="row align-items-center mb-3">
+                    <div class="col">
+                        <button type="submit" class="btn btn-success">Mark Selected as Received</button>
+                    </div>
+                    <div class="col-auto">
+                        <h5>
+                            Selected Total Paid:
+                            <span id="selectedTotal" class="fw-bold text-primary">₹0.00</span>
+                        </h5>
+                    </div>
+                </div>
+           
+           </div>
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th><input type="checkbox" id="selectAll" /></th>
+                        <th>Date</th>
+                        <th>SampleId</th>
+                        <th>Patient</th>
+                        <th>Patient Name</th>
+                        <th>Payment ID</th>
+                        <th>Method</th>
+                        <th>Note</th>
+                        <th>TotalAmount</th>
+                        <th>Bill Amount(AD)</th>
+                        <th>DiscountAmount</th>
+                        <th>Paid Amount</th>
+                        <th>Remaining</th>
+                        <th>Received By</th>
+                        <th>Owner Received?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (t.IsReceivedByOwner)
+                                {
+                                    <!-- ✅ Disable checkbox if already received by owner -->
+                                    <input type="checkbox" name="selectedTransactionIds" value="@t.TransactionId" disabled title="Already received by owner" />
+                                }
+                                else if (t.PaidAmount == 0)
+                                {
+                                    <!-- ✅ Disable checkbox if paid amount is 0 -->
+                                    <input type="checkbox" name="selectedTransactionIds" value="@t.TransactionId" disabled title="Paid amount is 0" />
+                                }
+                                else
+                                {
+                                    <!-- ✅ Allow selection otherwise -->
+                                    <input type="checkbox" name="selectedTransactionIds" value="@t.TransactionId" />
+                                }
+                            </td>
+                            
+                            <td>@t.TransactionDate.ToString("dd-MMM-yyyy HH:mm")</td>
+                            <td>@t.SampleId</td>
+                            <td>@t.PatientId</td>
+                            <td>@t.PatientName</td>
+                            <td>@t.PaymentId</td>
+                            <td>@t.PaymentMethod</td>
+                            <td>@t.Notes</td>
+                            <td>@t.TotalAmount</td>
+                            <td>₹@t.BillAmount</td>
+                            <td>@t.DiscountAmount</td>
+                            <td>₹@t.PaidAmount</td>
+                            <td>₹@t.RemainingAmount</td>
+                            <td>@t.PaymentRecivedBy</td>
+                            <td>
+                                @if (t.IsReceivedByOwner)
+                                {
+                                    <span class="badge bg-success">Yes</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning">No</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+    </form>
     <!-- Pagination controls -->
     <div class="d-flex justify-content-end align-items-center gap-3 mt-3">
         <!-- Items per page -->
@@ -142,5 +299,42 @@
         </div>
     </div>
 
-    <a asp-action="Index" class="btn btn-secondary mt-3">Back to Dashboard</a>
+
 </div>
+@* @section Scripts {
+    <script>
+        // ✅ Select/Deselect all checkboxes (except disabled)
+        document.getElementById("selectAll").addEventListener("change", function () {
+            const checkboxes = document.querySelectorAll('input[name="selectedTransactionIds"]:not(:disabled)');
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+    </script>
+} *@
+@section Scripts {
+    <script>
+        // ✅ Select/Deselect all checkboxes (except disabled)
+        document.getElementById("selectAll").addEventListener("change", function () {
+            const checkboxes = document.querySelectorAll('input[name="selectedTransactionIds"]:not(:disabled)');
+            checkboxes.forEach(cb => cb.checked = this.checked);
+            updateSelectedTotal();
+        });
+
+        // ✅ Listen for individual checkbox changes
+        document.querySelectorAll('input[name="selectedTransactionIds"]:not(:disabled)').forEach(cb => {
+            cb.addEventListener("change", updateSelectedTotal);
+        });
+
+        // ✅ Function to calculate total of selected rows
+        function updateSelectedTotal() {
+            let total = 0;
+            document.querySelectorAll('input[name="selectedTransactionIds"]:checked').forEach(cb => {
+                const row = cb.closest("tr");
+                const paidText = row.querySelector("td:nth-child(12)").innerText.trim().replace(/[₹,]/g, '');
+                const paidValue = parseFloat(paidText) || 0;
+                total += paidValue;
+            });
+
+            document.getElementById("selectedTotal").innerText = "₹" + total.toFixed(2);
+        }
+    </script>
+}

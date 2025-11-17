@@ -101,8 +101,6 @@
                 </ul>
             </div>
         </div>
-
-
     </form>
 
     <!-- Totals Section -->
@@ -147,6 +145,21 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-4">
+            <div class="card bg-light border-0 shadow-sm rounded-4 text-center h-100">
+                <div class="card-body py-4 d-flex flex-column justify-content-center">
+                    <h5 class="fw-bold text-dark mb-3">All Transactions</h5>
+                    <a asp-action="AllTransactions"
+                       asp-controller="LabOwnerDashboard"
+                       asp-route-startDate="@ViewBag.StartDate"
+                       asp-route-endDate="@ViewBag.EndDate"
+                       class="btn btn-info fw-semibold text-white px-4 rounded-pill mt-auto">
+                        <i class="bi bi-arrow-right-circle me-2"></i> View All
+                    </a>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Assistant Table -->
@@ -158,6 +171,8 @@
                     <th>Patient Count</th>
                     <th>Total Payment Collected</th>
                     <th>Total Remaining</th>
+                    <th>Total Online</th>
+                    <th>Total Cash</th>
                     <th>Paid by Owner</th>
                     <th>Unpaid to Owner</th>
                     <th>Action</th>
@@ -171,6 +186,8 @@
                         <td>@item.PatientCount</td>
                         <td class="text-success">₹@item.TotalPaymentCollected</td>
                         <td class="text-warning">₹@item.TotalRemainingAmount</td>
+                        <td class="text-warning">₹@item.TotalOnline</td>
+                        <td class="text-warning">₹@item.TotalCash</td>
                         <td class="text-primary">₹@item.TotalReceivedByOwner</td>
                         <td class="text-danger">₹@item.TotalUnpaidToOwner</td>
                         <td>

@@ -26,6 +26,7 @@ namespace LabCollect.Models
         public string? AssistantName { get; set; }
         public string? PrescriptionImgURL { get; set; }
         public int Visit { get; set; }
+        public decimal? DiscountAmount { get; set; }
         
 
     }
@@ -43,6 +44,9 @@ namespace LabCollect.Models
         public string Notes { get; set; }
         public string? PaymentRecievedBY { get; set; }
         public int PatientId { get; set; }
+        public decimal? DiscountAmount { get; set; }
+        public decimal? FinalDiscountAmount { get; set; }
+
     }
 
     public class AssistantDashboardViewModel
@@ -57,6 +61,7 @@ namespace LabCollect.Models
     public class    PaymentPatientViewModel
     {
         public int? PatientId { get; set; }
+        public int? PaymentId { get; set; }
         public string PatientName { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public string Gender { get; set; }

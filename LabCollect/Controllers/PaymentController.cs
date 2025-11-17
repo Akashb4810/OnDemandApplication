@@ -52,6 +52,11 @@ namespace LabCollect.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
+            if (model.SampleId == 0)
+            {
+                ModelState.AddModelError("SampleId", "Sample ID cannot be 0.");
+                return View(model);
+            }
 
             // Get AssistantId from session
             int assistantId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
@@ -111,7 +116,7 @@ namespace LabCollect.Controllers
             paymentTransactionViewModel.PaymentId = paymentId;
             paymentTransactionViewModel.TransactionDate = DateTime.Now;
             paymentTransactionViewModel.RemaingAmount = paymentinfo.RemaingAmount;
-            //paymentTransactionViewModel.PaymentMethod = paymentinfo.PaymentMethod;
+            paymentTransactionViewModel.DiscountAmount = paymentinfo.DiscountAmount;
             
             return View(paymentTransactionViewModel);
         }
@@ -132,7 +137,10 @@ namespace LabCollect.Controllers
             {
                 return View(model);
             }
-            model.RemaingAmount = model.RemaingAmount - model.PaidAmount;
+            model.RemaingAmount = (decimal)model.RemaingAmount 
+                      - ((decimal?)model.PaidAmount ?? 0) 
+                      - ((decimal?)model.DiscountAmount ?? 0);
+            model.DiscountAmount = model.FinalDiscountAmount;
             var result =await _paymentService.Update(model);
             if (!result)
             {

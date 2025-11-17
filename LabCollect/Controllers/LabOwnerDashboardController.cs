@@ -36,8 +36,8 @@ namespace LabCollect.Controllers
             if (!endDate.HasValue)
                 endDate = DateTime.Now;
 
-            var viewModel =await _ownerDashboardService.GetOwnerDashboardSummary(startDate, endDate, paymentReceivedBy);
-            if(paymentReceivedBy!=null)
+            var viewModel = await _ownerDashboardService.GetOwnerDashboardSummary(startDate, endDate, paymentReceivedBy);
+            if (paymentReceivedBy != null)
             {
                 viewModel.AssistantSummaries = viewModel.AssistantSummaries.Where(e => e.AssistantName != null && e.AssistantName.Contains(paymentReceivedBy, StringComparison.OrdinalIgnoreCase)).ToList();
             }
@@ -48,7 +48,7 @@ namespace LabCollect.Controllers
         }
 
         [Route("Transactions")]
-        public async Task<IActionResult> Transactions(int assistantId, DateTime? startDate, DateTime? endDate, string paymentReceivedBy,string paymentReceivedByName, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> Transactions(int assistantId, DateTime? startDate, DateTime? endDate, string paymentReceivedBy, string paymentReceivedByName, string paymentMethod, int page = 1, int pageSize = 10)
         {
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
                 return RedirectToAction("Login", "Account");
@@ -56,8 +56,17 @@ namespace LabCollect.Controllers
             if (!startDate.HasValue) startDate = DateTime.Today.AddDays(-30); // default last 30 days
             if (!endDate.HasValue) endDate = DateTime.Today;
 
-            var transactions =await _ownerDashboardService.GetAssistantPaymentTransactions(
+            var transactions = await _ownerDashboardService.GetAssistantPaymentTransactions(
                 assistantId, startDate, endDate, paymentReceivedBy);
+
+
+            if (!string.IsNullOrEmpty(paymentMethod))
+            {
+                transactions = transactions
+                    .Where(t => t.PaymentMethod != null &&
+                                t.PaymentMethod.Equals(paymentMethod, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
 
             // pagination
             int totalRecords = transactions.Count;
@@ -70,6 +79,7 @@ namespace LabCollect.Controllers
             ViewBag.EndDate = endDate.Value.ToString("yyyy-MM-dd");
             ViewBag.PaymentReceivedBy = paymentReceivedBy;
             ViewBag.PaymentReceivedByName = paymentReceivedByName;
+            ViewBag.PaymentMethod = paymentMethod;
             ViewBag.TotalPages = totalPages;
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
@@ -82,10 +92,56 @@ namespace LabCollect.Controllers
         {
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
                 return RedirectToAction("Login", "Account");
+            ViewBag.AssistantId = assistantId;
+            ViewBag.PaymentReceivedBy = paymentReceivedBy;
 
             await _ownerDashboardService.MarkReceivedByOwner(transactionId);
-            return RedirectToAction("Transactions", new { assistantId, startDate, endDate, paymentReceivedBy });
+            return RedirectToAction("AllTransactions", new { assistantId, startDate, endDate, paymentReceivedBy });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> AssistantMarkMultipleReceivedByOwner(List<int> selectedTransactionIds, int assistantId, DateTime? startDate, DateTime? endDate, string paymentReceivedBy, string paymentReceivedByName, string paymentMethod)
+        {
+            if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
+                return RedirectToAction("Login", "Account");
+            ViewBag.AssistantId = assistantId;
+            ViewBag.PaymentReceivedBy = paymentReceivedBy;
+            if (selectedTransactionIds == null || !selectedTransactionIds.Any())
+            {
+                TempData["Message"] = "No transactions selected.";
+                return RedirectToAction("Transactions", new { assistantId, startDate, endDate, paymentReceivedBy });
+            }
+
+            foreach (var id in selectedTransactionIds)
+            {
+                await _ownerDashboardService.MarkReceivedByOwner(id);
+            }
+
+            TempData["Message"] = $"{selectedTransactionIds.Count} transaction(s) marked as received successfully.";
+            return RedirectToAction("Transactions", new { assistantId, startDate, endDate, paymentReceivedBy,paymentReceivedByName,paymentMethod });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MarkMultipleReceivedByOwner(List<int> selectedTransactionIds, int assistantId, DateTime? startDate, DateTime? endDate, string paymentReceivedBy)
+        {
+            if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
+                return RedirectToAction("Login", "Account");
+
+            if (selectedTransactionIds == null || !selectedTransactionIds.Any())
+            {
+                TempData["Message"] = "No transactions selected.";
+                return RedirectToAction("AllTransactions", new { assistantId, startDate, endDate, paymentReceivedBy });
+            }
+
+            foreach (var id in selectedTransactionIds)
+            {
+                await _ownerDashboardService.MarkReceivedByOwner(id);
+            }
+
+            TempData["Message"] = $"{selectedTransactionIds.Count} transaction(s) marked as received successfully.";
+            return RedirectToAction("AllTransactions", new { assistantId, startDate, endDate, paymentReceivedBy });
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> Create()
@@ -93,9 +149,9 @@ namespace LabCollect.Controllers
             var model = new UserViewModel();
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
                 return RedirectToAction("Login", "Account");
-            // Load dropdown data
-            ViewBag.Roles = GetRoles();       // List<SelectListItem>
-            ViewBag.AppTypes = GetAppTypes(); // List<SelectListItem>
+
+            ViewBag.Roles = GetRoles();
+            ViewBag.AppTypes = GetAppTypes();
 
             return View(model);
         }
@@ -148,9 +204,9 @@ namespace LabCollect.Controllers
         public async Task<IActionResult> ExportToPdf(DateTime? startDate, DateTime? endDate, string? paymentReceivedBy)
         {
             // 1. Get main dashboard data
-            var model =await _ownerDashboardService.GetOwnerDashboardSummary(startDate, endDate, paymentReceivedBy);
+            var model = await _ownerDashboardService.GetOwnerDashboardSummary(startDate, endDate, paymentReceivedBy);
 
-            var paymentsDetails=await _paymentService.GetPaymentsByAssistant(0);
+            var paymentsDetails = await _paymentService.GetPaymentsByAssistant(0);
             // 2. Add patient-level details for each assistant
             foreach (var assistant in model.AssistantSummaries)
             {
@@ -178,13 +234,13 @@ namespace LabCollect.Controllers
         public async Task<IActionResult> ExportToPdfAsPaymentList(DateTime? startDate, DateTime? endDate, string? paymentReceivedBy)
         {
             // 1. Get main dashboard data
-           // var model = _ownerDashboardService.GetOwnerDashboardSummary(startDate, endDate, paymentReceivedBy);
+            // var model = _ownerDashboardService.GetOwnerDashboardSummary(startDate, endDate, paymentReceivedBy);
 
-            var paymentsDetails =await _paymentService.GetPaymentsByAssistant(0);
+            var paymentsDetails = await _paymentService.GetPaymentsByAssistant(0);
             paymentsDetails.OrderByDescending(e => e.SampleId);
-                if (startDate.HasValue)
+            if (startDate.HasValue)
                 paymentsDetails = paymentsDetails.Where(p => p.CreatedDate.Date >= startDate.Value.Date).ToList();
-                if (endDate.HasValue)
+            if (endDate.HasValue)
                 paymentsDetails = paymentsDetails.Where(p => p.CreatedDate.Date <= endDate.Value.Date).ToList();
 
 
@@ -205,7 +261,7 @@ namespace LabCollect.Controllers
             // var model = _ownerDashboardService.GetOwnerDashboardSummary(startDate, endDate, paymentReceivedBy);
 
             var paymentsDetails = await _paymentService.GetPaymentsByAssistant(0);
-            paymentsDetails= paymentsDetails.Where(e=>e.Status.Equals("Unpaid", StringComparison.OrdinalIgnoreCase)).OrderByDescending(e => e.CreatedDate).ToList();
+            paymentsDetails = paymentsDetails.Where(e => e.Status.Equals("Unpaid", StringComparison.OrdinalIgnoreCase)).OrderByDescending(e => e.CreatedDate).ToList();
             //if (startDate.HasValue)
             //    paymentsDetails = paymentsDetails.Where(p => p.CreatedDate.Date >= startDate.Value.Date).ToList();
             //if (endDate.HasValue)
@@ -223,5 +279,67 @@ namespace LabCollect.Controllers
 
         }
 
+        [Route("AllTransactions")]
+        public async Task<IActionResult> AllTransactions(int assistantId, DateTime? startDate, DateTime? endDate, string paymentReceivedBy, string paymentReceivedByName, int page = 1, int pageSize = 10)
+        {
+            if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
+                return RedirectToAction("Login", "Account");
+
+            if (!startDate.HasValue) startDate = DateTime.Today.AddDays(-30); // default last 30 days
+            if (!endDate.HasValue) endDate = DateTime.Today;
+
+            var transactions = await _ownerDashboardService.GetAllPaymentTransactions(
+               startDate, endDate);
+            if (paymentReceivedByName != null)
+            {
+                transactions = transactions.Where(e => e.PaymentRecivedBy.Trim().Equals(paymentReceivedByName.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+            // pagination
+            int totalRecords = transactions.Count;
+            int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+            var pagedList = transactions.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            // pass values to view
+            ViewBag.AssistantId = assistantId;
+            ViewBag.StartDate = startDate.Value.ToString("yyyy-MM-dd");
+            ViewBag.EndDate = endDate.Value.ToString("yyyy-MM-dd");
+            ViewBag.PaymentReceivedBy = paymentReceivedBy;
+            ViewBag.PaymentReceivedByName = paymentReceivedByName;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.CurrentPage = page;
+            ViewBag.PageSize = pageSize;
+
+            return View(pagedList);
+        }
+
+        public async Task<IActionResult> AssistantExportToPdf(DateTime? startDate, DateTime? endDate, string? paymentReceivedBy)
+        {
+            // 1. Get main dashboard data
+            var model = await _ownerDashboardService.GetOwnerDashboardSummary(startDate, endDate, paymentReceivedBy);
+            model.AssistantSummaries= model.AssistantSummaries.Where(e => e.AssistantId ==Convert.ToInt32( paymentReceivedBy)).ToList();
+            var paymentsDetails = await _paymentService.GetPaymentsByAssistant(0);
+            // 2. Add patient-level details for each assistant
+            foreach (var assistant in model.AssistantSummaries)
+            {
+                var payments = paymentsDetails.Where(e => e.AssistantId == assistant.AssistantId);
+
+                if (startDate.HasValue)
+                    payments = payments.Where(p => p.CreatedDate.Date >= startDate.Value.Date).ToList();
+                if (endDate.HasValue)
+                    payments = payments.Where(p => p.CreatedDate.Date <= endDate.Value.Date).ToList();
+
+                assistant.PatientPayments = payments.ToList(); // add new property for PDF rendering
+            }
+
+            // 3. Render PDF
+            return new ViewAsPdf("AssistantCollectionPdf", model)
+            {
+                FileName = "LabOwnerDashboard.pdf",
+                PageSize = Rotativa.AspNetCore.Options.Size.A4,
+                PageOrientation = Rotativa.AspNetCore.Options.Orientation.Landscape,
+                PageMargins = new Rotativa.AspNetCore.Options.Margins(10, 10, 10, 10)
+            };
+
+        }
     }
 }

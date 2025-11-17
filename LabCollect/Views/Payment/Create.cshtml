@@ -220,6 +220,11 @@
             const btnText = document.getElementById("btnText");
             const btnLoader = document.getElementById("btnLoader");
 
+                if (!form.checkValidity()) {
+            e.preventDefault(); // prevent form submission
+            e.stopPropagation();
+            return;
+        }
             btn.disabled = true;
             btnText.textContent = "Saving...";
             btnLoader.classList.remove("d-none");

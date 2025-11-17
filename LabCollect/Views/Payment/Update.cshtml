@@ -23,11 +23,32 @@
                     <input asp-for="PaymentId" class="form-control" placeholder="Enter Payment ID" />
                     <span asp-validation-for="PaymentId" class="text-danger"></span>
                 </div>
+                @* <input type="hidden" asp-for="DiscountAmount" id="FinalDiscount" /> *@
+<input type="hidden" asp-for="RemaingAmount" id="OriginalRemaining" />
+<input type="hidden" asp-for="FinalDiscountAmount" id="FinalDiscountAmount" />
 
                 <div class="mb-3">
                     <label asp-for="PaidAmount" class="form-label fw-semibold">Remaining Payment: @Model.RemaingAmount</label>
                 </div>
+                <!-- Actual Discount -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-success">
+                        Actual Discount: <span id="actualDiscount">@Model.DiscountAmount</span>
+                    </label>
+                </div>
 
+                <!-- Add New Discount -->
+                <div class="mb-3">
+                    <label asp-for="DiscountAmount" class="form-label fw-semibold">Discount Amount</label>
+                    <input asp-for="DiscountAmount" class="form-control" id="discountInput" placeholder="Enter Amount" />
+                </div>
+
+                <!-- Updated Remaining After Discount -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold text-primary">
+                        Updated Remaining Amount: <span id="updatedRemaining">@Model.RemaingAmount</span>
+                    </label>
+                </div>
                 <div class="mb-3">
                     <label asp-for="PaidAmount" class="form-label fw-semibold">Amount</label>
                     <input asp-for="PaidAmount" class="form-control" placeholder="Enter Amount" />
@@ -59,36 +80,58 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const paidAmountInput = document.querySelector("#PaidAmount");
-            const remainingAmount = parseFloat("@Model.RemaingAmount") || 0;
 
+            const initialRemaining = parseFloat("@Model.RemaingAmount") || 0;
+            const initialActualDiscount = parseFloat("@Model.DiscountAmount") || 0;
+
+            const discountInput = document.querySelector("#discountInput");
+            const actualDiscountLabel = document.querySelector("#actualDiscount");
+            const updatedRemainingLabel = document.querySelector("#updatedRemaining");
+
+            // FOR PAID AMOUNT VALIDATION
+            const paidAmountInput = document.querySelector("#PaidAmount");
+
+            // Update Discount + Remaining dynamically
+            discountInput.addEventListener("input", function () {
+                const newDiscount = parseFloat(discountInput.value) || 0;
+
+                // New total discount = old + new input
+                const totalDiscount = initialActualDiscount + newDiscount;
+                actualDiscountLabel.innerText = totalDiscount.toFixed(2);
+                     finalDiscountHidden.value = totalDiscount.toFixed(2);
+                // Update remaining
+                let newRemaining = initialRemaining - newDiscount;
+                if (newRemaining < 0) newRemaining = 0;
+
+                updatedRemainingLabel.innerText = newRemaining.toFixed(2);
+            });
+                const finalDiscountHidden = document.querySelector("#FinalDiscountAmount");
+            // Prevent paid > remaining
             paidAmountInput.addEventListener("input", function () {
+                const updatedRemaining = parseFloat(updatedRemainingLabel.innerText) || 0;
                 const paidAmount = parseFloat(paidAmountInput.value) || 0;
 
-                if (paidAmount > remainingAmount) {
-                    // Show a Bootstrap alert message (you can also use alert())
+                if (paidAmount > updatedRemaining) {
                     const alertDiv = document.createElement("div");
                     alertDiv.className = "alert alert-danger mt-2";
                     alertDiv.innerText = "❌ Paid amount cannot be greater than remaining amount.";
 
-                    // Remove any existing alert first
                     const existingAlert = document.querySelector(".alert-danger");
                     if (existingAlert) existingAlert.remove();
 
-                    // Insert alert after the PaidAmount input
                     paidAmountInput.parentNode.appendChild(alertDiv);
-
-                    // Optionally clear the invalid value
                     paidAmountInput.value = "";
                 } else {
-                    // Remove the alert if user corrects the value
                     const existingAlert = document.querySelector(".alert-danger");
                     if (existingAlert) existingAlert.remove();
                 }
+                    document.querySelector("#FinalDiscount").value = totalDiscount.toFixed(2);
+        document.querySelector("#OriginalRemaining").value = newRemaining.toFixed(2);
             });
+
         });
     </script>
 }
-

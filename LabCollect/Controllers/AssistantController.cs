@@ -111,6 +111,7 @@ namespace LabCollect.Controllers
             // 4. Filtered Payments Totals
             // ViewBag.TotalAmount_Filtered = filteredPayments.Where(e => e.AssistantId == assistantId).Sum(p => p.RemaingAmount);
             ViewBag.PatientCount_Filtered = filteredPayments.Where(e => e.AssistantId == assistantId).ToList().Count;
+            
             ViewBag.CashCount_Filtered = filteredPayments.Where(e => e.AssistantId == assistantId).Count(p => p.PaymentMethod == "Cash");
             ViewBag.OnlineCount_Filtered = filteredPayments.Where(e => e.AssistantId == assistantId).Count(p => p.PaymentMethod == "Online");
             ViewBag.UnpaidCount_Filtered = filteredPayments.Where(e => e.AssistantId == assistantId).Count(p => p.Status == "Unpaid");

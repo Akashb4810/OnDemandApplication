@@ -71,21 +71,7 @@
 <!-- Dashboard Cards -->
 <div class="d-flex flex-row flex-wrap mb-4 justify-content-between">
 
-    <div class="card text-center shadow-sm border-primary flex-fill m-1">
-        <div class="card-body">
-            <h6 class="card-title text-primary">Total Amount</h6>
-            <small class="text-muted">All: ₹@ViewBag.TotalAmount_All</small>
-            <h4 class="text-success">₹@ViewBag.TotalAmount_All</h4>
-        </div>
-    </div>
-
-    <div class="card text-center shadow-sm border-primary flex-fill m-1">
-        <div class="card-body">
-            <h6 class="card-title text-primary">Paid Amount</h6>
-            <small class="text-muted">All: ₹@ViewBag.paidTotalAmount_All</small>
-            <h4 class="text-success">₹@ViewBag.paidTotalAmount_All</h4>
-        </div>
-    </div>
+    
 
     <div class="card text-center shadow-sm border-primary flex-fill m-1">
         <div class="card-body">
@@ -99,7 +85,7 @@
         <div class="card-body">
             <h6 class="card-title text-info">Patients</h6>
             <small class="text-muted">All: @ViewBag.PatientCount_All</small>
-            <h4>@ViewBag.PatientCount_Filtered</h4>
+            <h4>@ViewBag.PatientCount_All</h4>
         </div>
     </div>
 
@@ -107,7 +93,7 @@
         <div class="card-body">
             <h6 class="card-title text-success">Cash</h6>
             <small class="text-muted">All: @ViewBag.CashCount_All</small>
-            <h4>@ViewBag.CashCount_Filtered</h4>
+            <h4>@ViewBag.CashCount_All</h4>
         </div>
     </div>
 
@@ -115,7 +101,7 @@
         <div class="card-body">
             <h6 class="card-title text-warning">Online</h6>
             <small class="text-muted">All: @ViewBag.OnlineCount_All</small>
-            <h4>@ViewBag.OnlineCount_Filtered</h4>
+            <h4>@ViewBag.OnlineCount_All</h4>
         </div>
     </div>
 
@@ -123,7 +109,7 @@
         <div class="card-body">
             <h6 class="card-title text-danger">Unpaid</h6>
             <small class="text-muted">All: @ViewBag.UnpaidCount_All</small>
-            <h4>@ViewBag.UnpaidCount_Filtered</h4>
+            <h4>@ViewBag.UnpaidCount_All</h4>
         </div>
     </div>
 </div>

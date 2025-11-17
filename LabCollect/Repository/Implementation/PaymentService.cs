@@ -101,6 +101,7 @@ namespace LabCollect.Repository.Implementation
                     Address = reader["Address"] != DBNull.Value ? reader["Address"].ToString() : string.Empty,
                     CreatedDate = reader["CreatedDate"] != DBNull.Value ? Convert.ToDateTime(reader["CreatedDate"]) : DateTime.MinValue,
                     PrescriptionImgURL = reader["PrescriptionImgURL"] != DBNull.Value ? reader["PrescriptionImgURL"].ToString() : string.Empty,
+                    DiscountAmount = reader["DiscountAmount"] != DBNull.Value ? Convert.ToDecimal(reader["DiscountAmount"]) : 0m
                 });
             }
             return list;
@@ -131,6 +132,7 @@ namespace LabCollect.Repository.Implementation
                     AssistantId = reader["AssistantId"] != DBNull.Value ? reader.GetInt32(reader.GetOrdinal("AssistantId")) : 0,
                     AssistantName = reader["AssistantName"] != DBNull.Value ? reader["AssistantName"].ToString() : string.Empty,
                     SampleId = reader["SampleId"] != DBNull.Value ? Convert.ToInt32(reader["SampleId"]) : 0,
+                    DiscountAmount = reader["DiscountAmount"] != DBNull.Value ? reader.GetDecimal(reader.GetOrdinal("DiscountAmount")) : 0m
 
                 };
             }
@@ -150,6 +152,8 @@ namespace LabCollect.Repository.Implementation
                     // Input parameters
                     cmd.Parameters.AddWithValue("@PaymentId", paymentViewModel.PaymentId);
                     cmd.Parameters.AddWithValue("@PaidAmount", paymentViewModel.PaidAmount);
+                    cmd.Parameters.AddWithValue("@DiscountAmount", paymentViewModel.DiscountAmount);
+                    cmd.Parameters.AddWithValue("@RemainingAmount", paymentViewModel.RemaingAmount);
 
                     cmd.Parameters.AddWithValue("@PaymentMethod",
                         (object?)paymentViewModel.PaymentMethod ?? DBNull.Value);

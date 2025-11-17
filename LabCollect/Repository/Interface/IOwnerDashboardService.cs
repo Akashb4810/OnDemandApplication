@@ -8,6 +8,8 @@ namespace LabCollect.Repository.Interface
         Task<List<TransactionDetail>> GetAssistantPaymentTransactions(int assistantId, DateTime? startDate, DateTime? endDate, string paymentReceivedBy);
         Task  MarkReceivedByOwner(int transactionId);
         bool CreateUser(UserViewModel model, out int newUserId);
+        Task<List<TransactionDetail>> GetAllPaymentTransactions(DateTime? startDate, DateTime? endDate);
+
     }
 
 }

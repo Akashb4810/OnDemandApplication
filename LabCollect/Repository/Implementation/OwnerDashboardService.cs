@@ -40,8 +40,10 @@ namespace LabCollect.Repository.Implementation
                             TotalBillPayment = reader.IsDBNull(reader.GetOrdinal("TotalBillPayment")) ? 0 : reader.GetDecimal(reader.GetOrdinal("TotalBillPayment")),
                             TotalRemainingAmount = reader.IsDBNull(reader.GetOrdinal("TotalRemainingAmount")) ? 0 : reader.GetDecimal(reader.GetOrdinal("TotalRemainingAmount")),
                             TotalReceivedByOwner = reader.IsDBNull(reader.GetOrdinal("TotalReceivedByOwner")) ? 0 : reader.GetDecimal(reader.GetOrdinal("TotalReceivedByOwner")),
-                            TotalUnpaidToOwner = reader.IsDBNull(reader.GetOrdinal("TotalUnpaidToOwner")) ? 0 : reader.GetDecimal(reader.GetOrdinal("TotalUnpaidToOwner"))
-
+                            TotalUnpaidToOwner = reader.IsDBNull(reader.GetOrdinal("TotalUnpaidToOwner")) ? 0 : reader.GetDecimal(reader.GetOrdinal("TotalUnpaidToOwner")),
+                            TotalOnline = reader.IsDBNull(reader.GetOrdinal("TotalOnlinePayment")) ? 0 : reader.GetDecimal(reader.GetOrdinal("TotalOnlinePayment")),
+                            TotalCash = reader.IsDBNull(reader.GetOrdinal("TotalCashPayment")) ? 0 : reader.GetDecimal(reader.GetOrdinal("TotalCashPayment")),
+                            TotalDiscount = reader.IsDBNull(reader.GetOrdinal("TotalDiscount")) ? 0 : reader.GetDecimal(reader.GetOrdinal("TotalDiscount")),
                         });
                     }
                 }
@@ -58,12 +60,13 @@ namespace LabCollect.Repository.Implementation
                 TotalUnpaidToOwner = summaries.Sum(x => x.TotalUnpaidToOwner),
                 StartDate = startDate ?? DateTime.Today,
                 EndDate = endDate ?? DateTime.Today,
-                PaymentReceivedBy = paymentReceivedBy
+                PaymentReceivedBy = paymentReceivedBy,
+                TotalDiscount=summaries.Sum(x=>x.TotalDiscount)
             };
         }
 
         public async Task<List<TransactionDetail>> GetAssistantPaymentTransactions(int assistantId, DateTime? startDate, DateTime? endDate, string paymentReceivedBy)
-        {      
+        {
             var transactions = new List<TransactionDetail>();
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -121,7 +124,13 @@ namespace LabCollect.Repository.Implementation
     ? 0 : reader.GetDecimal(reader.GetOrdinal("DiscountAmount")),
 
                             BillAmount = reader.IsDBNull(reader.GetOrdinal("Amount"))
-    ? 0 : reader.GetDecimal(reader.GetOrdinal("Amount"))
+    ? 0 : reader.GetDecimal(reader.GetOrdinal("Amount")),
+                            SampleId = reader.IsDBNull(reader.GetOrdinal("sampleId"))
+    ? 0 : reader.GetInt32(reader.GetOrdinal("sampleId"))
+                            //                        TotalOnline = reader.IsDBNull(reader.GetOrdinal("TotalOnlinePayment"))
+                            //? 0 : reader.GetDecimal(reader.GetOrdinal("TotalOnlinePayment")),
+                            //                        TotalCash = reader.IsDBNull(reader.GetOrdinal("TotalCashPayment"))
+                            //? 0 : reader.GetDecimal(reader.GetOrdinal("TotalCashPayment"))
 
                         });
                     }
@@ -194,6 +203,76 @@ namespace LabCollect.Repository.Implementation
                 }
                 return sb.ToString();
             }
+        }
+
+        public async Task<List<TransactionDetail>> GetAllPaymentTransactions(DateTime? startDate, DateTime? endDate)
+        {
+            var transactions = new List<TransactionDetail>();
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("sp_GetAllPaymentTransactions", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@StartDate", (object?)startDate ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@EndDate", (object?)endDate ?? DBNull.Value);
+
+                await conn.OpenAsync();
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        transactions.Add(new TransactionDetail
+                        {
+                            TransactionId = reader.IsDBNull(reader.GetOrdinal("TransactionId"))
+    ? 0 : reader.GetInt32(reader.GetOrdinal("TransactionId")),
+
+                            PaymentId = reader.IsDBNull(reader.GetOrdinal("PaymentId"))
+    ? 0 : reader.GetInt32(reader.GetOrdinal("PaymentId")),
+
+                            SampleId = reader.IsDBNull(reader.GetOrdinal("SampleId"))
+    ? 0 : reader.GetInt32(reader.GetOrdinal("SampleId")),
+
+                            PatientId = reader.IsDBNull(reader.GetOrdinal("PatientId"))
+    ? 0 : reader.GetInt32(reader.GetOrdinal("PatientId")),
+
+                            PatientName = reader.IsDBNull(reader.GetOrdinal("PatientName"))
+    ? string.Empty : reader.GetString(reader.GetOrdinal("PatientName")),
+
+                            PaidAmount = reader.IsDBNull(reader.GetOrdinal("PaidAmount"))
+    ? 0 : reader.GetDecimal(reader.GetOrdinal("PaidAmount")),
+
+                            PaymentMethod = reader.IsDBNull(reader.GetOrdinal("PaymentMethod"))
+    ? string.Empty : reader.GetString(reader.GetOrdinal("PaymentMethod")),
+
+                            Notes = reader.IsDBNull(reader.GetOrdinal("Notes"))
+    ? null : reader.GetString(reader.GetOrdinal("Notes")),
+
+                            TransactionDate = reader.IsDBNull(reader.GetOrdinal("TransactionDate"))
+    ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("TransactionDate")),
+
+                            PaymentRecivedBy = reader.IsDBNull(reader.GetOrdinal("PaymentRecivedBy"))
+    ? string.Empty : reader.GetString(reader.GetOrdinal("PaymentRecivedBy")),
+
+                            IsReceivedByOwner = reader.IsDBNull(reader.GetOrdinal("IsReceivedByOwner"))
+    ? false : reader.GetBoolean(reader.GetOrdinal("IsReceivedByOwner")),
+
+                            RemainingAmount = reader.IsDBNull(reader.GetOrdinal("RemainingAmount"))
+    ? 0 : reader.GetDecimal(reader.GetOrdinal("RemainingAmount")),
+
+                            TotalAmount = reader.IsDBNull(reader.GetOrdinal("TotalAmount"))
+    ? 0 : reader.GetDecimal(reader.GetOrdinal("TotalAmount")),
+                            DiscountAmount = reader.IsDBNull(reader.GetOrdinal("DiscountAmount"))
+    ? 0 : reader.GetDecimal(reader.GetOrdinal("DiscountAmount")),
+
+                            BillAmount = reader.IsDBNull(reader.GetOrdinal("Amount"))
+    ? 0 : reader.GetDecimal(reader.GetOrdinal("Amount"))
+
+                        });
+                    }
+                }
+            }
+
+            return transactions;
         }
 
 

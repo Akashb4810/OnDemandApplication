@@ -80,37 +80,30 @@
 <h2>Lab Owner Dashboard Report</h2>
 <p><strong>Date:</strong> @DateTime.Now.ToString("dd-MMM-yyyy")</p>
 
-<!-- Totals Section -->
-<div class="summary-boxes">
-    <div class="summary-box">
-        <strong>Total Patients</strong><br />
-        @Model.TotalPatients
-    </div>
-    <div class="summary-box">
-        <strong>Total Payment</strong><br />
-        ₹@Model.TotalPayment
-    </div>
-    <div class="summary-box">
-        <strong>Total Remaining</strong><br />
-        ₹@Model.TotalRemaining
-    </div>
-    <div class="summary-box">
-        <strong>Received by Owner</strong><br />
-        ₹@Model.TotalReceivedByOwner
-    </div>
-    <div class="summary-box">
-        <strong>Unpaid to Owner</strong><br />
-        ₹@Model.TotalUnpaidToOwner
-    </div>
-    <div class="summary-box">
-        <strong>Unpaid to Owner</strong><br />
-        ₹@Model.TotalDiscount
-    </div>
-</div>
 
 <!-- Assistant Summaries -->
 @foreach (var assistant in Model.AssistantSummaries)
 {
+    var totalCashPaid = assistant.PatientPayments?
+        .Where(p => p.PaymentMethod == "Cash")
+        .Sum(p => p.PaidAmount) ?? 0;
+
+    var totalOnlinePaid = assistant.PatientPayments?
+        .Where(p => p.PaymentMethod == "Online")
+        .Sum(p => p.PaidAmount) ?? 0;
+
+    var totalPaid = totalCashPaid + totalOnlinePaid;
+    var totalRemaining = assistant.PatientPayments?.Sum(p => p.RemaingAmount) ?? 0;
+    var grandTotal = assistant.PatientPayments?.Sum(p => p.Amount) ?? 0;
+
+@*     var totalCashPaidToOwner = assistant.PatientPayments?
+        .Where(p => p.PaymentMethod == "Cash" && p.IsReceivedByOwner)
+        .Sum(p => p.PaidAmount) ?? 0;
+
+    var totalOnlinePaidToOwner = assistant.PatientPayments?
+        .Where(p => p.PaymentMethod == "Online" && p.IsReceivedByOwner)
+        .Sum(p => p.PaidAmount) ?? 0; *@
+
     <div class="assistant-section">
         <h4>@assistant.AssistantName</h4>
         <div class="assistant-info">
@@ -119,11 +112,49 @@
             <strong>Total Collected Assistants:</strong> ₹@assistant.TotalPaymentCollected |
             <strong>Remaining:</strong> ₹@assistant.TotalRemainingAmount |
             <strong>Paid by Owner:</strong> ₹@assistant.TotalReceivedByOwner |
-            <strong>Unpaid to Owner:</strong> ₹@assistant.TotalUnpaidToOwner |
-            <strong>Total Discount Given:</strong> ₹@assistant.TotalDiscount |
-            <strong>Total Cash Payment:</strong> ₹@assistant.TotalCash |
-            <strong>Total Online Payment:</strong> ₹@assistant.TotalOnline |
+            <strong>Unpaid to Owner:</strong> ₹@assistant.TotalUnpaidToOwner  |
+            <strong>Cash Collection:</strong> ₹@assistant.TotalCash  |
+            <strong>Online Collection:</strong> ₹@assistant.TotalOnline  |
+            <strong>Discount:</strong> ₹@assistant.TotalDiscount  |
         </div>
+        <div class="summary-boxes">
+            <div class="summary-box">
+                <strong>Total Cash Paid</strong><br />
+                ₹@string.Format("{0:N2}", totalCashPaid)
+            </div>
+            <div class="summary-box">
+                <strong>Total Online Paid</strong><br />
+                ₹@string.Format("{0:N2}", totalOnlinePaid)
+            </div>
+            <div class="summary-box">
+                <strong>Total Paid (Cash + Online)</strong><br />
+                ₹@string.Format("{0:N2}", totalPaid)
+            </div>
+            <div class="summary-box">
+                <strong>Total Remaining</strong><br />
+                ₹@string.Format("{0:N2}", totalRemaining)
+            </div>
+            <div class="summary-box">
+                <strong>Grand Total</strong><br />
+                ₹@string.Format("{0:N2}", grandTotal)
+            </div>
+        </div>
+
+        <!-- 👑 Paid to Owner Summary -->
+       @*  <div class="summary-boxes">
+            <div class="summary-box">
+                <strong>Cash Paid to Owner</strong><br />
+                ₹@string.Format("{0:N2}", totalCashPaidToOwner)
+            </div>
+            <div class="summary-box">
+                <strong>Online Paid to Owner</strong><br />
+                ₹@string.Format("{0:N2}", totalOnlinePaidToOwner)
+            </div>
+            <div class="summary-box">
+                <strong>Total Paid to Owner</strong><br />
+                ₹@string.Format("{0:N2}", (totalCashPaidToOwner + totalOnlinePaidToOwner))
+            </div>
+        </div> *@
 
         @if (assistant.PatientPayments != null && assistant.PatientPayments.Any())
         {
@@ -135,7 +166,6 @@
                         <th>Total Amount</th>
                         <th>Paid</th>
                         <th>Remaining</th>
-                        <th>Discount</th>
                         <th>Payment Method</th>
                         <th>Status</th>
                         <th>Date</th>
@@ -150,7 +180,6 @@
                             <td>₹@p.Amount</td>
                             <td>₹@p.PaidAmount</td>
                             <td>₹@p.RemaingAmount</td>
-                            <td>₹@p.DiscountAmount</td>
                             <td>@p.PaymentMethod</td>
                             <td>@p.Status</td>
                             <td>@p.CreatedDate.ToString("dd-MMM-yyyy")</td>

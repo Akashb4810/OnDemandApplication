@@ -14,6 +14,9 @@
         public decimal TotalReceivedByOwner { get; set; }
         public decimal TotalUnpaidToOwner { get; set; }
         public List<PaymentViewModel>? PatientPayments { get; set; }
+        public decimal TotalOnline { get; set; }
+        public decimal TotalCash { get; set; }
+        public decimal TotalDiscount { get; set; }
     }
 
     public class OwnerDashboardViewModel
@@ -29,6 +32,7 @@
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string PaymentReceivedBy { get; set; }
+        public decimal? TotalDiscount { get; set; }
     }
 
     public class TransactionDetail
@@ -47,12 +51,15 @@
         public decimal TotalAmount { get; set; }
         public decimal DiscountAmount { get; set; }
         public decimal BillAmount { get; set; }
+        //public decimal TotalOnline { get; set; }
+        //public decimal TotalCash { get; set; }
+        public int SampleId { get; set; }
 
     }
 
     public class UserViewModel
     {
-        public string UserName { get; set; }          // Required
+        public string UserName { get; set; }         
         public string PasswordHash { get; set; }      // Required
         public int RoleId { get; set; }               // Required
         public int AppTypeId { get; set; }            // Required
