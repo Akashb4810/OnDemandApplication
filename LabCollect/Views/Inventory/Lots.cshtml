@@ -1,0 +1,42 @@
+﻿@model List<LabCollect.Models.ReagentLot>
+
+@{
+    ViewData["Title"] = "Lots";
+    if (User.IsInRole("Owner"))
+    {
+        Layout = "~/Views/_masterUserLayoutPage.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/_assistantLayoutPage.cshtml";
+    }
+}
+
+<h2>Lots</h2>
+
+<p>
+    <a class="btn btn-primary btn-sm"
+       href="@Url.Action("AddLot", new { reagentId = ViewBag.ReagentId })">Add Lot</a>
+</p>
+
+<table class="table table-bordered table-sm">
+    <thead>
+        <tr>
+            <th>Lot No</th>
+            <th>Quantity</th>
+            <th>Expiry</th>
+            <th>Received</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var lot in Model)
+        {
+            <tr>
+                <td>@lot.LotId</td>
+                <td>@lot.Quantity</td>
+                <td>@lot.ExpiryDate?.ToShortDateString()</td>
+                <td>@lot.ReceivedDate.ToShortDateString()</td>
+            </tr>
+        }
+    </tbody>
+</table>

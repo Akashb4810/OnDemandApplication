@@ -1,0 +1,42 @@
+﻿@model OwnProducts.Models.Order
+
+@{
+    ViewData["Title"] = "Order";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h3 class="text-center mb-4">Place Your Order</h3>
+
+                    @using (Html.BeginForm())
+                    {
+                        @Html.TextBoxFor(m => m.Name,
+                                 new { @class = "form-control mb-3", placeholder = "Your Name" })
+
+                        @Html.TextBoxFor(m => m.Mobile,
+                                 new { @class = "form-control mb-3", placeholder = "Mobile Number" })
+
+                        @Html.TextBoxFor(m => m.Product,
+                                 new { @class = "form-control mb-3", @readonly = "readonly" })
+
+                        @Html.TextBoxFor(m => m.Quantity,
+                                 new { @class = "form-control mb-3", placeholder = "Quantity" })
+
+                        @Html.TextAreaFor(m => m.Address,
+                                 new { @class = "form-control mb-3", placeholder = "Delivery Address" })
+
+                        <button class="btn btn-danger w-100">
+                            Confirm Order
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

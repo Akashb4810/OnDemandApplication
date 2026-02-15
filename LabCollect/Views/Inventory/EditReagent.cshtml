@@ -1,0 +1,30 @@
+﻿@model LabCollect.Models.Reagent
+
+<h3 class="text-primary fw-bold mb-4">
+    <i class="bi bi-pencil-square"></i> Edit Reagent
+</h3>
+
+<form method="post">
+
+    <input type="hidden" asp-for="ReagentId" />
+
+    <div class="mb-3">
+        <label class="fw-bold">Name</label>
+        <input asp-for="Name" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="fw-bold">Unit</label>
+        <input asp-for="Unit" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="fw-bold">Low Stock Limit</label>
+        <input asp-for="LowStockLimit" type="number" class="form-control" required />
+    </div>
+
+    <button class="btn btn-primary">
+        <i class="bi bi-check-circle"></i> Update
+    </button>
+
+</form>

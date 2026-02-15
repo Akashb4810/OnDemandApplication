@@ -26,6 +26,9 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IPaymentService, PaymentService>();
 builder.Services.AddTransient<IOwnerDashboardService, OwnerDashboardService>();
 builder.Services.AddTransient<IPatientService, PatientService>();
+builder.Services.AddTransient<ITestsService, TestService>();
+builder.Services.AddTransient<IInventoryService, InventoryService>();
+
 //builder.Services.AddTransient<IAccountService, AccountService>();
 var app = builder.Build();
 

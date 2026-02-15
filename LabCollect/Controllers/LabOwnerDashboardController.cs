@@ -237,12 +237,14 @@ namespace LabCollect.Controllers
             // var model = _ownerDashboardService.GetOwnerDashboardSummary(startDate, endDate, paymentReceivedBy);
 
             var paymentsDetails = await _paymentService.GetPaymentsByAssistant(0);
-            paymentsDetails.OrderByDescending(e => e.SampleId);
             if (startDate.HasValue)
                 paymentsDetails = paymentsDetails.Where(p => p.CreatedDate.Date >= startDate.Value.Date).ToList();
             if (endDate.HasValue)
                 paymentsDetails = paymentsDetails.Where(p => p.CreatedDate.Date <= endDate.Value.Date).ToList();
 
+            paymentsDetails = paymentsDetails
+        .OrderByDescending(e => e.SampleId)
+        .ToList();
 
             // 3. Render PDF
             return new ViewAsPdf("OwnerDashbordPatientListPdf", paymentsDetails)

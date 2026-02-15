@@ -1,0 +1,106 @@
+﻿@model LabCollect.Models.LaboratoryTestModel
+@{
+    var role = User.IsInRole("Owner") ? "Owner" : "Assistant";
+
+    if (User.IsInRole("Owner"))
+    {
+        Layout = "~/Views/_masterUserLayoutPage.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/_assistantLayoutPage.cshtml";
+    }
+    var isEdit = Model?.TestId > 0;
+    
+}
+
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header text-center text-white py-3" style="background: linear-gradient(135deg, #0d6efd, #4e9af1);">
+                    <h4><i class="bi bi-clipboard2-pulse me-2"></i>Create Laboratory Test</h4>
+                </div>
+                <div class="card-body p-4">
+                    @using (Html.BeginForm("Create", "Tests", FormMethod.Post, new { @class = "needs-validation", novalidate = "novalidate" }))
+                    {
+                        @Html.HiddenFor(m => m.TestId)
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.TestName, new { @class = "form-label fw-semibold" })
+                            @Html.TextBoxFor(m => m.TestName, new { @class = "form-control", placeholder = "Enter test name", required = "required" })
+                            @Html.ValidationMessageFor(m => m.TestName, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.Description, new { @class = "form-label fw-semibold" })
+                            @Html.TextAreaFor(m => m.Description, new { @class = "form-control", placeholder = "Enter description", rows = 3 })
+                        </div>
+
+                       @*  <div class="mb-3">
+                            @Html.LabelFor(m => m.CategoryId, "Category", new { @class = "form-label fw-semibold" })
+                            @Html.DropDownListFor(m => m.CategoryId,
+                                     new SelectList(ViewBag.Categories, "Value", "Text"),
+                                     "-- Select Category --",
+                                     new { @class = "form-select", required = "required" })
+                            @Html.ValidationMessageFor(m => m.CategoryId, "", new { @class = "text-danger" })
+                        </div> *@
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.NormalRange, new { @class = "form-label fw-semibold" })
+                            @Html.TextBoxFor(m => m.NormalRange, new { @class = "form-control", placeholder = "e.g. 70-110 mg/dL" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.Unit, new { @class = "form-label fw-semibold" })
+                            @Html.TextBoxFor(m => m.Unit, new { @class = "form-control", placeholder = "e.g. mg/dL" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.Price, new { @class = "form-label fw-semibold" })
+                            @Html.TextBoxFor(m => m.Price, new
+                                {
+                                    @class = "form-control",
+                                    placeholder = "Enter price",
+                                    type = "number",
+                                    step = "0.01",
+                                    min = "0",
+                                    required = "required"
+                                })
+                            @Html.ValidationMessageFor(m => m.Price, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-save me-1"></i> @(isEdit ? "Update Test" : "Save Test")
+                            </button>
+                            <a href="@Url.Action("Index", "Tests")" class="btn btn-outline-secondary btn-lg">
+                                <i class="bi bi-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts { 
+    <!-- Bootstrap validation -->
+    <script>
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
+}

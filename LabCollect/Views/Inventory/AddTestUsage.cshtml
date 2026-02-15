@@ -1,0 +1,128 @@
+﻿@model LabCollect.Models.AddTestReagentUsageModel
+
+@{
+    ViewData["Title"] = "Add Reagent Usage";
+    if (User.IsInRole("Owner"))
+    {
+        Layout = "~/Views/_masterUserLayoutPage.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/_assistantLayoutPage.cshtml";
+    }
+
+    var reagents = ViewBag.Reagents as List<LabCollect.Models.Reagent>;
+    var assigned = ViewBag.Assigned as List<LabCollect.Models.TestReagentUsageViewModel>;
+}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="card shadow-lg rounded-4">
+                <div class="card-header bg-primary text-white text-center py-3">
+                    <h4><i class="bi bi-droplet-half"></i> Add Reagent Usage</h4>
+                </div>
+
+                <div class="card-body p-4">
+                    @using (Html.BeginForm())
+                    {
+                        @Html.HiddenFor(m => m.TestId)
+
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Reagent</th>
+                                    <th width="25%">Qty / Test</th>
+                                    <th width="10%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reagentTableBody"></tbody>
+                        </table>
+
+                        <button type="button" class="btn btn-success mb-3" onclick="addRow()">
+                            <i class="bi bi-plus-circle"></i> Add Reagent
+                        </button>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="@Url.Action("Index", "Tests", new { testId = Model.TestId })"
+                               class="btn btn-outline-secondary btn-lg px-4">
+                                <i class="bi bi-arrow-left"></i> Cancel
+                            </a>
+
+                            <button type="submit" class="btn btn-primary btn-lg px-4">
+                                <i class="bi bi-save"></i> Save
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    let counter = 0;
+    const reagents = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(reagents));
+    const assigned = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(assigned));
+
+    // Load existing assigned reagents automatically
+    window.onload = function () {
+        assigned.forEach(a => addRow(a.ReagentId, a.QuantityPerTest, true));
+    };
+
+    function addRow(existingReagentId = null, qty = null, isExisting = false) {
+        let row = `
+            <tr id="row_${counter}">
+                <td>
+                    <select name="Reagents[${counter}].ReagentId" class="form-select reagent-select">
+                        <option value="">-- Select Reagent --</option>
+                        ${reagents.map(r => `
+                            <option value="${r.ReagentId}"
+                                ${existingReagentId == r.ReagentId ? "selected" : ""}>
+                                ${r.Name}
+                            </option>
+                        `).join("")}
+                    </select>
+                </td>
+
+                <td>
+                    <input type="number" name="Reagents[${counter}].QuantityPerTest"
+                           value="${qty ?? ""}"
+                           class="form-control" step="0.01" />
+                </td>
+
+                <td class="text-center">
+                    ${isExisting
+                        ? `<span class="text-success fw-bold">✔</span>`
+                        : `<button type="button" class="btn btn-danger btn-sm" onclick="removeRow(${counter})">
+                                <i class="bi bi-x-circle"></i>
+                           </button>`}
+                </td>
+            </tr>
+        `;
+
+        document.getElementById("reagentTableBody").insertAdjacentHTML("beforeend", row);
+        counter++;
+    }
+
+    function removeRow(id) {
+        document.getElementById("row_" + id).remove();
+    }
+
+    // Prevent duplicate selection
+    document.addEventListener("change", function (e) {
+        if (e.target.classList.contains("reagent-select")) {
+            let selected = Array.from(document.querySelectorAll(".reagent-select"))
+                                .map(x => x.value)
+                                .filter(x => x);
+
+            document.querySelectorAll(".reagent-select").forEach(select => {
+                let current = select.value;
+                Array.from(select.options).forEach(opt => {
+                    opt.disabled = (opt.value && opt.value !== current && selected.includes(opt.value));
+                });
+            });
+        }
+    });
+</script>

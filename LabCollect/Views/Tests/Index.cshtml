@@ -1,0 +1,195 @@
+﻿@model List<LabCollect.Models.LaboratoryTestModel>
+
+@{
+    ViewData["Title"] = "Laboratory Tests Dashboard";
+    if (User.IsInRole("Owner"))
+    {
+        Layout = "~/Views/_masterUserLayoutPage.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/_assistantLayoutPage.cshtml";
+    }
+}
+
+<!-- Filter Form -->
+<form asp-action="Index" method="get" class="row g-3 mb-4">
+    <div class="col-md-3">
+        <label for="testName" class="form-label">Test Name</label>
+        <input type="text" name="testName" class="form-control" placeholder="Enter test name" value="@ViewBag.TestName" />
+    </div>
+
+    <!-- Submit & Clear -->
+    <div class="col-md-2 align-self-end">
+        <button type="submit" class="btn btn-primary w-100">Apply</button>
+    </div>
+    <div class="col-md-2 align-self-end">
+        <a href="@Url.Action("Index")" class="btn btn-outline-secondary w-100">Clear</a>
+    </div>
+    <div class="col-md-2 align-self-end">
+    <a asp-action="Create" class="btn btn-success">
+            <i class="fa fa-plus"> Add New Test</i>
+    </a>
+    </div>
+</form>
+
+<!-- Dashboard Cards -->
+<div class="d-flex flex-row flex-wrap mb-4 justify-content-between">
+    <div class="card text-center shadow-sm border-primary flex-fill m-1">
+        <div class="card-body">
+            <h6 class="card-title text-primary">Total Tests</h6>
+            <h4>@ViewBag.TotalTests_All</h4>
+        </div>
+    </div>
+
+    <div class="card text-center shadow-sm border-info flex-fill m-1">
+        <div class="card-body">
+            <h6 class="card-title text-info">Total Price</h6>
+            <h4>₹@ViewBag.TotalPrice_All</h4>
+        </div>
+    </div>
+</div>
+
+<!-- TITLE + CREATE BUTTON -->
+<div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+    <h4>Laboratory Tests</h4>
+   @*  <a asp-action="Create" class="btn btn-primary">
+        <i class="fa fa-plus"></i> Add New Test
+    </a> *@
+</div>
+
+<!-- Table: Lab Tests -->
+<div class="table-responsive" style="overflow-x:auto;">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Test ID</th>
+                <th>Test Name</th>
+                <th>Description</th>
+                <th>Normal Range</th>
+                <th>Unit</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.TestId</td>
+                    <td>@item.TestName</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.Description))
+                        {
+                            <button type="button" class="btn btn-sm btn-info"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#descModal"
+                                    data-desc="@item.Description">
+                                View
+                            </button>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No Description</span>
+                        }
+                    </td>
+
+                    <td>@item.NormalRange</td>
+                    <td>@item.Unit</td>
+                    <td>₹@item.Price</td>
+
+                    <td>
+                        <a asp-action="Create" asp-route-id="@item.TestId" title="Edit Test">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                        <a asp-action="AddTestUsage" class="btn btn-success" asp-controller="Inventory" asp-route-testId="@item.TestId" title="Add Test Usage">
+                            <i class="fa-solid fa-plus"></i>
+
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+<div class="d-flex justify-content-end align-items-center gap-3 mt-3">
+    <form asp-action="Index" method="get" class="d-flex align-items-center gap-2">
+        <label for="pageSize" class="mb-0">Items per page:</label>
+        <select name="pageSize" id="pageSize" class="form-select form-select-sm"
+                style="width:auto;" onchange="this.form.submit()">
+            @foreach (var size in new int[] { 5, 10, 15, 25 })
+            {
+                if (ViewBag.PageSize == size)
+                {
+                    <option value="@size" selected>@size</option>
+                }
+                else
+                {
+                    <option value="@size">@size</option>
+                }
+            }
+        </select>
+
+        <input type="hidden" name="testName" value="@ViewBag.TestName" />
+    </form>
+
+    <span class="mb-0">Page @ViewBag.CurrentPage of @ViewBag.TotalPages</span>
+
+    <div class="btn-group" role="group">
+        <a class="btn btn-outline-secondary btn-sm @(ViewBag.CurrentPage == 1 ? "disabled" : "")"
+           href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, pageSize = ViewBag.PageSize, testName = ViewBag.TestName })">
+            <i class="fa fa-chevron-left"></i>
+        </a>
+
+        <a class="btn btn-outline-secondary btn-sm @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")"
+           href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, pageSize = ViewBag.PageSize, testName = ViewBag.TestName })">
+            <i class="fa fa-chevron-right"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Description Modal -->
+<div class="modal fade" id="descModal" tabindex="-1" aria-labelledby="descModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="descModalLabel">Test Description</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="modalDesc"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TempData Messages -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        // Description Modal Loader
+        var descModal = document.getElementById('descModal');
+        descModal.addEventListener('show.bs.modal', function(event){
+            var button = event.relatedTarget;
+            var desc = button.getAttribute('data-desc');
+            descModal.querySelector('#modalDesc').textContent = desc;
+        });
+    </script>
+}

@@ -1,0 +1,47 @@
+﻿
+@{
+    ViewData["Title"] = "Products";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center fw-bold mb-4">Our Products</h2>
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="card shadow text-center">
+                <div class="card-body">
+                    <h5>100g Pack</h5>
+                    <p class="fw-bold">₹120</p>
+                    <a href="/Home/Order?product=100g Pack"
+                       class="btn btn-danger">Order</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow text-center">
+                <div class="card-body">
+                    <h5>250g Pack</h5>
+                    <p class="fw-bold">₹250</p>
+                    <a href="/Home/Order?product=250g Pack"
+                       class="btn btn-danger">Order</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow text-center">
+                <div class="card-body">
+                    <h5>500g Pack</h5>
+                    <p class="fw-bold">₹450</p>
+                    <a href="/Home/Order?product=500g Pack"
+                       class="btn btn-danger">Order</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+

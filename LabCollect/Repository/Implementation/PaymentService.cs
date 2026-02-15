@@ -16,60 +16,118 @@ namespace LabCollect.Repository.Implementation
         }
 
 
-
         public async Task<bool> create(PaymentPatientViewModel model)
         {
-           // newPaymentId = 0; // default if fails
-
             using (SqlConnection conn = new SqlConnection(_connectionString))
-            using (SqlCommand cmd = new SqlCommand("sp_InsertPayment", conn))
             {
-                cmd.CommandType = CommandType.StoredProcedure;
+                await conn.OpenAsync();
+                SqlTransaction transaction = conn.BeginTransaction(); // ✅ Start transaction
 
-                // Input parameters – handle NULLs with DBNull.Value
-                cmd.Parameters.AddWithValue("@PatientId", (object?)model.PatientId ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@PatientName", (object?)model.PatientName ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@DateOfBirth", (object?)model.DateOfBirth ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@Gender", (object?)model.Gender ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@ContactNumber", (object?)model.ContactNumber ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@Email", (object?)model.Email ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@Address", (object?)model.Address ?? DBNull.Value);
-
-                cmd.Parameters.AddWithValue("@Amount", model.Amount);
-                cmd.Parameters.AddWithValue("@PaidAmount", model.PaidAmount); // even if 0 it’s required
-                cmd.Parameters.AddWithValue("@TotalAmount", model.TotalAmount); // even if 0 it’s required
-                cmd.Parameters.AddWithValue("@DiscountAmount", model.DiscountAmount); // even if 0 it’s required
-                cmd.Parameters.AddWithValue("@PaymentMethod", (object?)model.PaymentMethod ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@Status", model.Status);
-                cmd.Parameters.AddWithValue("@AssistantId", (object?)model.AssistantId ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@SampleId", (object?)model.SampleId ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@PrescriptionImgURL", "");
-                cmd.Parameters.AddWithValue("@Notes", model.Notes);
-
-                // Output parameters
-                var isSuccessParam = new SqlParameter("@IsSuccess", SqlDbType.Bit)
+                try
                 {
-                    Direction = ParameterDirection.Output
-                };
-                cmd.Parameters.Add(isSuccessParam);
+                    using (SqlCommand cmd = new SqlCommand("sp_InsertPayment", conn, transaction))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
 
-                var newPaymentIdParam = new SqlParameter("@NewPaymentId", SqlDbType.Int)
+                        // ✅ Input parameters
+                        cmd.Parameters.AddWithValue("@PatientId", (object?)model.PatientId ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@PatientName", (object?)model.PatientName ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@DateOfBirth", (object?)model.DateOfBirth ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Gender", (object?)model.Gender ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@ContactNumber", (object?)model.ContactNumber ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Email", (object?)model.Email ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Address", (object?)model.Address ?? DBNull.Value);
+
+                        cmd.Parameters.AddWithValue("@Amount", model.Amount);
+                        cmd.Parameters.AddWithValue("@PaidAmount", model.PaidAmount);
+                        cmd.Parameters.AddWithValue("@TotalAmount", model.TotalAmount);
+                        cmd.Parameters.AddWithValue("@DiscountAmount", (object?)model.DiscountAmount ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@PaymentMethod", (object?)model.PaymentMethod ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Status", model.Status);
+                        cmd.Parameters.AddWithValue("@AssistantId", (object?)model.AssistantId ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@SampleId", (object?)model.SampleId ?? DBNull.Value);
+                        cmd.Parameters.AddWithValue("@PrescriptionImgURL", model.TestImagePath);
+                        cmd.Parameters.AddWithValue("@Notes", model.Notes ?? "");
+
+                        // ✅ Output params
+                        var isSuccessParam = new SqlParameter("@IsSuccess", SqlDbType.Bit)
+                        {
+                            Direction = ParameterDirection.Output
+                        };
+                        cmd.Parameters.Add(isSuccessParam);
+
+                        var newPaymentIdParam = new SqlParameter("@NewPaymentId", SqlDbType.Int)
+                        {
+                            Direction = ParameterDirection.Output
+                        };
+                        cmd.Parameters.Add(newPaymentIdParam);
+
+                        // Insert Payment
+                        await cmd.ExecuteNonQueryAsync();
+
+                        bool isSuccess = Convert.ToBoolean(isSuccessParam.Value);
+                        int newPaymentId = (newPaymentIdParam.Value != DBNull.Value) ? (int)newPaymentIdParam.Value : 0;
+
+                        if (!isSuccess || newPaymentId <= 0)
+                        {
+                            transaction.Rollback();  // ❌ Rollback if payment insert failed
+                            return false;
+                        }
+
+                        // ✅ Insert selected tests
+                        if (model.SelectedTestIds != null)
+                        {
+                            //foreach (var selectedId in model.SelectedTestIds)
+                            //{
+                            //    using (SqlCommand cmd1 = new SqlCommand("sp_InsertPaymentTest", conn, transaction))
+                            //    {
+                            //        cmd1.CommandType = CommandType.StoredProcedure;
+                            //        cmd1.Parameters.AddWithValue("@PaymentId", newPaymentId);
+                            //        cmd1.Parameters.AddWithValue("@TestId", selectedId);
+
+                            //        SqlParameter returnParam = new SqlParameter();
+                            //        returnParam.Direction = ParameterDirection.ReturnValue;
+                            //        cmd1.Parameters.Add(returnParam);
+
+                            //        await cmd1.ExecuteNonQueryAsync();
+
+                            //        int result = (int)returnParam.Value;
+                            //        if (result != 1)
+                            //        {
+                            //            transaction.Rollback(); // ❌ If one test insert fails, rollback all
+                            //            return false;
+                            //        }
+                            //    }
+                            //}
+
+                            foreach (var testId in model.SelectedTestIds)
+                            {
+                                var cmd2 = new SqlCommand("INSERT INTO PaymentTests (PaymentId, TestId) VALUES (@p,@t); SELECT SCOPE_IDENTITY()", conn, transaction);
+                                cmd2.Parameters.AddWithValue("@p", newPaymentId);
+                                cmd2.Parameters.AddWithValue("@t", testId);
+                                var paymentTestId = Convert.ToInt32(cmd2.ExecuteScalar());
+
+                                // call stored proc using same connection + transaction
+                                //using (var sp = new SqlCommand("sp_DeductStock_OnPaymentTest", conn, transaction))
+                                //{
+                                //    sp.CommandType = CommandType.StoredProcedure;
+                                //    sp.Parameters.AddWithValue("@PaymentTestId", paymentTestId);
+                                //    sp.ExecuteNonQuery();
+                                //}
+                            }
+                        }
+
+                        transaction.Commit();  // ✅ All good — commit transaction
+                        return true;
+                    }
+                }
+                catch (Exception ex)
                 {
-                    Direction = ParameterDirection.Output
-                };
-                cmd.Parameters.Add(newPaymentIdParam);
-
-               await conn.OpenAsync();
-               await cmd.ExecuteNonQueryAsync();
-
-                // Read output parameters
-                bool isSuccess = Convert.ToBoolean(isSuccessParam.Value);
-                if (newPaymentIdParam.Value != DBNull.Value)
-                    //newPaymentId = Convert.ToInt32(newPaymentIdParam.Value);
-
-                return isSuccess;
+                    transaction.Rollback(); // ❌ Rollback on exception
+                                            // optionally log error
+                    throw;
+                }
             }
-            return false;
         }
 
         public async Task<List<PaymentViewModel>> GetPaymentsByAssistant(int assistantId)

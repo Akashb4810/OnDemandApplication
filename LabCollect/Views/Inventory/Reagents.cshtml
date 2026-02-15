@@ -1,0 +1,31 @@
+﻿
+@{
+    ViewData["Title"] = "Reagents";
+    if (User.IsInRole("Owner"))
+    {
+        Layout = "~/Views/_masterUserLayoutPage.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/_assistantLayoutPage.cshtml";
+    }
+}
+
+@model List<Reagent>
+<h2>Reagents</h2>
+@Html.ActionLink("Add Reagent", "AddReagent", null, new { @class = "btn btn-primary mb-2" })
+<table class="table">
+    <thead><tr><th>Name</th><th>Unit</th><th>Alert</th><th></th></tr></thead>
+    <tbody>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.Name</td>
+                <td>@r.Unit</td>
+                <td>@r.LowStockLimit</td>
+                <td>@Html.ActionLink("Lots", "Lots", new { reagentId = r.ReagentId })</td>
+            </tr>
+        }
+    </tbody>
+</table>
+

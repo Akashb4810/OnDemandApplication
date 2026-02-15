@@ -1,0 +1,154 @@
+﻿@* @model List<LabCollect.Models.ReagentStockViewModel>
+
+@{
+    ViewData["Title"] = "Reagent Stock";
+    Layout = "~/Views/_masterUserLayoutPage.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white rounded-top-4 py-3">
+            <h3 class="mb-0 fw-bold">🧪 Reagent Stock Overview</h3>
+        </div>
+
+        <div class="card-body p-4">
+
+            <table class="table table-hover table-bordered align-middle shadow-sm rounded-4 overflow-hidden">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Reagent</th>
+                        <th>Unit</th>
+                        <th>Total Qty</th>
+                        <th>Status</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="@(item.IsLow ? "table-warning" : "")">
+                            <td class="fw-semibold text-primary">@item.Reagent.ReagentName</td>
+                            <td>@item.Reagent.Unit</td>
+                            <td>@item.TotalQty</td>
+                            <td>
+                                @if (item.IsLow)
+                                {
+                                    <span class="badge bg-danger px-3 py-2">LOW</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success px-3 py-2">OK</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                @Html.ActionLink(
+                                         "Lots",
+                                         "Lots",
+                                         new { reagentId = item.Reagent.ReagentId },
+                                         new { @class = "btn btn-sm btn-outline-primary me-1" }
+                                         )
+
+                                @Html.ActionLink(
+                                         "Edit",
+                                         "EditReagent",
+                                         new { id = item.Reagent.ReagentId },
+                                         new { @class = "btn btn-sm btn-outline-secondary" }
+                                         )
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+ *@
+
+@model IEnumerable<LabCollect.Models.ReagentIndexViewModel>
+@{
+    ViewBag.Title = "Reagent Inventory";
+    if (User.IsInRole("Owner"))
+    {
+        Layout = "~/Views/_masterUserLayoutPage.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/_assistantLayoutPage.cshtml";
+    }
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+
+<!-- DataTable CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+
+<div class="d-flex justify-content-between mb-4">
+    <h2 class="fw-bold text-primary">
+        <i class="bi bi-droplet me-2"></i> Reagent Inventory
+    </h2>
+
+    <a href="/Inventory/AddReagent" class="btn btn-primary add-btn">
+        <i class="bi bi-plus-circle"></i> Add Reagent
+    </a>
+</div>
+
+<table id="reagentTable" class="table table-striped table-hover table-bordered shadow-sm">
+    <thead class="table-primary">
+        <tr>
+            <th>Name</th>
+            <th>Unit</th>
+            <th>Stock</th>
+            <th>Tests Done</th>
+            <th style="width:150px;">Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="fw-bold">@item.Name</td>
+                <td>@item.Unit</td>
+
+                <td>
+                    @if (item.TotalQty <= item.LowStockLimit)
+                    {
+                        <span class="badge bg-danger">Low (@item.TotalQty)</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">@item.TotalQty</span>
+                    }
+                </td>
+
+                <td>
+                    <span class="badge bg-info text-dark">@item.TotalTestsDone</span>
+                </td>
+
+                <td>
+                    <a href="/Inventory/ViewLots?reagentId=@item.ReagentId"
+                       class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-box-seam"></i> View Lots
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- DataTable JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#reagentTable').DataTable({
+            "pageLength": 10,
+            "lengthMenu": [5, 10, 20, 50],
+            "order": [], // No default sorting
+        });
+    });
+</script>
+

@@ -78,9 +78,10 @@ namespace LabCollect.Models
         public int? AssistantId { get; set; }
         public int SampleId { get; set; }
 
-        //public IFormFile TestImage { get; set; }
-        //public string? TestImagePath { get; set; }
+        public IFormFile TestImage { get; set; }
+        public string? TestImagePath { get; set; }
         public string Notes { get; set; }
+        public List<int> SelectedTestIds { get; set; }
 
     }
     public class Patient

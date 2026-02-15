@@ -3,7 +3,14 @@
 @{
     ViewData["Title"] = "Assistant Dashboard";
     Layout = "~/Views/_assistantLayoutPage.cshtml";
-
+    if (User.IsInRole("Owner"))
+    {
+        Layout = "~/Views/_masterUserLayoutPage.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/_assistantLayoutPage.cshtml";
+    }
     string selectedMethod = ViewBag.SelectedPaymentMethod as string ?? "";
     string selectedStatus = ViewBag.SelectedStatus as string ?? "";
 }

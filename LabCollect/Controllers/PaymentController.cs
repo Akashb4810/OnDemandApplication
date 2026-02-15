@@ -12,11 +12,12 @@ namespace LabCollect.Controllers
     {
         private readonly IPaymentService _paymentService;
         private readonly IPatientService _patientService;
-
-        public PaymentController(IPaymentService paymentService, IPatientService patientService)
+        private readonly ITestsService _testsService;
+        public PaymentController(IPaymentService paymentService, IPatientService patientService, ITestsService testsService)
         {
             _paymentService = paymentService;
             _patientService = patientService;
+            _testsService = testsService;
         }
 
         [HttpGet("Payment/Create")]
@@ -25,6 +26,8 @@ namespace LabCollect.Controllers
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
                 return RedirectToAction("Login", "Account");
 
+            var tests = await _testsService.GetAllAsync();
+            ViewBag.Tests = tests;
             if (patientId>0 )
             {
                 var patient =await _patientService.GetPatientById(patientId);
@@ -48,12 +51,14 @@ namespace LabCollect.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PaymentPatientViewModel model)
         {
+            var tests = await _testsService.GetAllAsync();
             if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == null)
             {
                 return RedirectToAction("Login", "Account");
             }
             if (model.SampleId == 0)
             {
+                ViewBag.Tests = tests;
                 ModelState.AddModelError("SampleId", "Sample ID cannot be 0.");
                 return View(model);
             }
@@ -61,34 +66,36 @@ namespace LabCollect.Controllers
             // Get AssistantId from session
             int assistantId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             model.AssistantId = assistantId;
-
+           
+            ViewBag.Tests = tests;
             if (!ModelState.IsValid)
             {
+                ViewBag.Tests = tests;
                 return View(model);
             }
 
-            // Handle Test Image Upload
-            //if (model.TestImage != null && model.TestImage.Length > 0)
-            //{
-            //    // Create folder if not exists
-            //    var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/tests");
-            //    if (!Directory.Exists(uploadDir))
-            //    {
-            //        Directory.CreateDirectory(uploadDir);
-            //    }
+             //Handle Test Image Upload
+            if (model.TestImage != null && model.TestImage.Length > 0)
+            {
+                // Create folder if not exists
+                var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/tests");
+                if (!Directory.Exists(uploadDir))
+                {
+                    Directory.CreateDirectory(uploadDir);
+                }
 
-            //    // Unique file name
-            //    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.TestImage.FileName);
-            //    var filePath = Path.Combine(uploadDir, fileName);
+                // Unique file name
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.TestImage.FileName);
+                var filePath = Path.Combine(uploadDir, fileName);
 
-            //    using (var stream = new FileStream(filePath, FileMode.Create))
-            //    {
-            //        model.TestImage.CopyTo(stream);
-            //    }
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    model.TestImage.CopyTo(stream);
+                }
 
-            //    // Save path (relative to wwwroot)
-            //    model.TestImagePath = "/uploads/tests/" + fileName;
-            //}
+                // Save path (relative to wwwroot)
+                model.TestImagePath = "/uploads/tests/" + fileName;
+            }
 
             // Save Payment Data
             var result =await _paymentService.create(model);

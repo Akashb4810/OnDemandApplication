@@ -1,0 +1,27 @@
+﻿
+@{
+    ViewData["Title"] = "TestUsage";
+    if (User.IsInRole("Owner"))
+    {
+        Layout = "~/Views/_masterUserLayoutPage.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/_assistantLayoutPage.cshtml";
+    }
+}
+
+@model List<TestReagentUsageModel>
+<h2>Test Reagent Usage (TestId=@ViewBag.TestId)</h2>
+@Html.ActionLink("Add Usage", "AddTestUsage", new { testId = ViewBag.TestId }, new { @class = "btn btn-primary mb-2" })
+<table class="table">
+    <thead><tr><th>Reagent</th><th>QtyPerTest</th></tr></thead>
+    <tbody>
+        @foreach (var u in Model)
+        {
+            <tr><td>@u.ReagentName</td><td>@u.QuantityPerTest</td></tr>
+        }
+    </tbody>
+</table>
+
+

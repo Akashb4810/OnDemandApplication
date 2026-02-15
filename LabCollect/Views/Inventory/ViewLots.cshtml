@@ -1,0 +1,110 @@
+﻿@model IEnumerable<LabCollect.Models.ReagentLot>
+@{
+    ViewBag.Title = "Reagent Lots";
+    if (User.IsInRole("Owner"))
+    {
+        Layout = "~/Views/_masterUserLayoutPage.cshtml";
+    }
+    else if (User.IsInRole("Assistant"))
+    {
+        Layout = "~/Views/_assistantLayoutPage.cshtml";
+    }
+    
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+
+<div class="d-flex justify-content-between mb-4">
+    <h3 class="text-primary fw-bold">
+        <i class="bi bi-box-seam"></i> Reagent Lots
+    </h3>
+
+    <a href="/Inventory/AddLot?reagentId=@ViewBag.ReagentId" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Add Lot
+    </a>
+</div>
+
+<table class="table table-bordered table-striped shadow-sm">
+    <thead class="table-primary">
+        <tr>
+            <th>Lot No</th>
+            <th>Quantity</th>
+            <th>Tests/Unit</th>
+            <th>Tests Done</th>
+            <th>Total Tests</th>
+            <th>Remaining</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var lot in Model)
+        {
+            var totalTests = lot.Quantity * lot.TestsPerUnit;
+            var remaining = totalTests - lot.TestsDone;
+
+            <tr>
+                <td>@lot.LotNumber</td>
+                <td>@lot.Quantity</td>
+                <td>@lot.TestsPerUnit</td>
+                <td>@lot.TestsDone</td>
+                <td>@totalTests</td>
+
+                <td>
+                    @if (remaining <= 10)
+                    {
+                        <span class="badge bg-danger">Low (@remaining)</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">@remaining</span>
+                    }
+                </td>
+
+                <td>
+                    <a href="/Inventory/DeleteLot?id=@lot.LotId"
+                       onclick="return confirm('Delete this lot?')"
+                       class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-trash"></i>
+                    </a>
+
+                    <button class="btn btn-outline-info btn-sm"
+                            onclick="openModal(@lot.LotId)">
+                        <i class="bi bi-pencil-square"></i> Update Tests
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Update Tests Modal -->
+<div class="modal fade" id="testModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="/Inventory/UpdateTestsDone">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Update Tests Done</h5>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="LotId" name="LotId" />
+
+                    <label>Completed Tests</label>
+                    <input type="number" class="form-control" name="CompletedTests" required />
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openModal(id) {
+        document.getElementById("LotId").value = id;
+        var modal = new bootstrap.Modal(document.getElementById("testModal"));
+        modal.show();
+    }
+</script>
